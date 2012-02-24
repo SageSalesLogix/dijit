@@ -329,6 +329,34 @@ var TreeNode = declare(
 			_Container.prototype.removeChild.call(this, child);
 		}, this);
 
+		// All the old children of this TreeNode are subject for destruction if
+		//		1) they aren't listed in the new children array (items)
+		//		2) they aren't immediately adopted by another node (DnD)
+		this.defer(function(){
+			array.forEach(oldChildren, function(node){
+				if(!node._destroyed && !node.getParent()){
+					// If node is in selection then remove it.
+					tree.dndController.removeTreeNode(node);
+
+					// Deregister mapping from item id --> this node
+					var id = model.getIdentity(node.item),
+						ary = tree._itemNodesMap[id];
+					if(ary.length == 1){
+						delete tree._itemNodesMap[id];
+					}else{
+						var index = array.indexOf(ary, node);
+						if(index != -1){
+							ary.splice(index, 1);
+						}
+					}
+
+					// And finally we can destroy the node
+					node.destroyRecursive();
+				}
+			});
+
+		});
+
 		this.state = "LOADED";
 
 		if(items && items.length > 0){
@@ -1088,7 +1116,7 @@ var Tree = declare("dijit.Tree", [_Widget, _TemplatedMixin], {
 			// clear record of recent printables (being saved for multi-char letter navigation),
 			// because "a", down-arrow, "b" shouldn't search for "ab"
 			if(this._curSearch){
-				clearTimeout(this._curSearch.timer);
+				this._curSearch.timer.remove();
 				delete this._curSearch;
 			}
 
@@ -1240,7 +1268,7 @@ var Tree = declare("dijit.Tree", [_Widget, _TemplatedMixin], {
 			// We are continuing a search.  Ex: user has pressed 'a', and now has pressed
 			// 'b', so we want to search for nodes starting w/"ab".
 			cs.pattern = cs.pattern + message.key;
-			clearTimeout(cs.timer);
+			cs.timer.remove();
 		}else{
 			// We are starting a new search
 			cs = this._curSearch = {
@@ -1250,9 +1278,8 @@ var Tree = declare("dijit.Tree", [_Widget, _TemplatedMixin], {
 		}
 
 		// set/reset timer to forget recent keystrokes
-		var self = this;
-		cs.timer = setTimeout(function(){
-			delete self._curSearch;
+		cs.timer = this.defer(function(){
+			delete this._curSearch;
 		}, this.multiCharSearchDuration);
 
 		// Navigate to TreeNode matching keystrokes [entered so far].
@@ -1629,7 +1656,7 @@ var Tree = declare("dijit.Tree", [_Widget, _TemplatedMixin], {
 
 	destroy: function(){
 		if(this._curSearch){
-			clearTimeout(this._curSearch.timer);
+			this._curSearch.timer.remove();
 			delete this._curSearch;
 		}
 		if(this.rootNode){

@@ -237,11 +237,11 @@ var InlineEditor = declare("dijit._InlineEditor", [_Widget, _TemplatedMixin, _Wi
 		//		protected
 
 		this.editWidget.focus();
-		setTimeout(lang.hitch(this, function(){
+		this.defer(function(){
 			if(this.editWidget.focusNode && this.editWidget.focusNode.tagName == "INPUT"){
 				_TextBoxMixin.selectInputText(this.editWidget.focusNode);
 			}
-		}), 0);
+		});
 	}
 });
 
@@ -424,7 +424,7 @@ var InlineEditBox = declare("dijit.InlineEditBox", _Widget, {
 		this._onMouseOut();
 
 		// Since FF gets upset if you move a node while in an event handler for that node...
-		setTimeout(lang.hitch(this, "edit"), 0);
+		this.defer("edit");
 	},
 
 	edit: function(){
@@ -482,12 +482,17 @@ var InlineEditBox = declare("dijit.InlineEditBox", _Widget, {
 		domStyle.set(ww.domNode, { position: this._savedPosition, visibility: "visible", opacity: "1" });
 		domAttr.set(this.displayNode, "tabIndex", "-1"); // needed by WebKit for TAB from editor to skip displayNode
 
-		// Replace the display widget with edit widget, leaving them both displayed for a brief time so that
-		// focus can be shifted without incident.  (browser may needs some time to render the editor.)
-		setTimeout(lang.hitch(ww, function(){
-			this.focus(); // both nodes are showing, so we can switch focus safely
-			this._resetValue = this.getValue();
-		}), 0);
+		// After edit widget has finished initializing (in particular need to wait for dijit.Editor),
+		// or immediately if there is no onLoadDeferred Deferred,
+		// replace the display widget with edit widget, leaving them both displayed for a brief time so that
+		// focus can be shifted without incident.
+		Deferred.when(ww.editWidget.onLoadDeferred, lang.hitch(ww, function(){
+			// Note: not sure if we still need a defer() now that there's a Deferred.when()
+			this.defer(function(){
+				this.focus(); // both nodes are showing, so we can switch focus safely
+				this._resetValue = this.getValue();
+			});
+		}));
 	},
 
 	_onBlur: function(){
@@ -500,12 +505,12 @@ var InlineEditBox = declare("dijit.InlineEditBox", _Widget, {
 		this.inherited(arguments);
 		if(!this.editing){
 			/* causes IE focus problems, see TooltipDialog_a11y.html...
-			setTimeout(lang.hitch(this, function(){
+			this.defer(function(){
 				if(this.wrapperWidget){
 					this.wrapperWidget.destroy();
 					delete this.wrapperWidget;
 				}
-			}), 0);
+			});
 			*/
 		}
 	},
@@ -572,7 +577,7 @@ var InlineEditBox = declare("dijit.InlineEditBox", _Widget, {
 
 		if(this._started){
 			// tell the world that we have changed
-			setTimeout(lang.hitch(this, "onChange", val), 0); // setTimeout prevents browser freeze for long-running event handlers
+			this.defer(function(){ this.onChange(val); }); // defer prevents browser freeze for long-running event handlers
 		}
 		// contextual (auto) text direction depends on the text value
 		if(this.textDir == "auto"){
@@ -599,7 +604,7 @@ var InlineEditBox = declare("dijit.InlineEditBox", _Widget, {
 		this._set('editing', false);
 
 		// tell the world that we have no changes
-		setTimeout(lang.hitch(this, "onCancel"), 0); // setTimeout prevents browser freeze for long-running event handlers
+		this.defer("onCancel"); // defer prevents browser freeze for long-running event handlers
 
 		this._showText(focus);
 	},

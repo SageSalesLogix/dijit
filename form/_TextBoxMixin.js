@@ -267,8 +267,8 @@ var _TextBoxMixin = declare("dijit.form._TextBoxMixin", null, {
 			if(this.onInput(faux) === false){
 				event.stop(faux); // return false means stop
 			}
-			if(faux.wasConsumed){ return; } // if preventDefault was called
-			setTimeout(lang.hitch(this, "_onInput", faux), 0); // widget notification after key has posted
+			if(faux._wasConsumed){ return; } // if preventDefault was called
+			this.defer(function(){ this._onInput(faux); }); // widget notification after key has posted
 		};
 		array.forEach([ "onkeydown", "onkeypress", "onpaste", "oncut", "oninput", "oncompositionend" ], function(event){
 			this.connect(this.textbox, event, handleEvent);
@@ -349,6 +349,13 @@ var _TextBoxMixin = declare("dijit.form._TextBoxMixin", null, {
 					_TextBoxMixin.selectInputText(this.textbox);
 				}
 			});
+			// in case the mouseup never comes
+			this.defer(function(){ 
+				if(this._selectOnClickHandle){
+					this.disconnect(this._selectOnClickHandle);
+					this._selectOnClickHandle = null;
+				}
+			}, 500); // if mouseup not received soon, then treat it as some gesture
 		}
 		// call this.inherited() before refreshState(), since this.inherited() will possibly scroll the viewport
 		// (to scroll the TextBox into view), which will affect how _refreshState() positions the tooltip
