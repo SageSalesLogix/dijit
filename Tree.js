@@ -329,34 +329,6 @@ var TreeNode = declare(
 			_Container.prototype.removeChild.call(this, child);
 		}, this);
 
-		// All the old children of this TreeNode are subject for destruction if
-		//		1) they aren't listed in the new children array (items)
-		//		2) they aren't immediately adopted by another node (DnD)
-		this.defer(function(){
-			array.forEach(oldChildren, function(node){
-				if(!node._destroyed && !node.getParent()){
-					// If node is in selection then remove it.
-					tree.dndController.removeTreeNode(node);
-
-					// Deregister mapping from item id --> this node
-					var id = model.getIdentity(node.item),
-						ary = tree._itemNodesMap[id];
-					if(ary.length == 1){
-						delete tree._itemNodesMap[id];
-					}else{
-						var index = array.indexOf(ary, node);
-						if(index != -1){
-							ary.splice(index, 1);
-						}
-					}
-
-					// And finally we can destroy the node
-					node.destroyRecursive();
-				}
-			});
-
-		});
-
 		this.state = "LOADED";
 
 		if(items && items.length > 0){
