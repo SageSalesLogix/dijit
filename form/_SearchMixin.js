@@ -6,7 +6,7 @@ define([
 	"dojo/keys", // keys
 	"dojo/_base/lang", // lang.clone lang.hitch
 	"dojo/query", // query
-	"dojo/sniff", // has("ie")
+	"dojo/_base/sniff", // has("ie")
 	"dojo/string", // string.substitute
 	"../registry"	// registry.byId
 ], function(filter, declare, Deferred, event, keys, lang, query, has, string, registry){
