@@ -380,7 +380,7 @@ define([
 			// tags:
 			//		private
 			if(!this._showTimer){
-				this._showTimer = this.defer(function(){ this.open(target); }, this.showDelay);
+				this._showTimer = this.defer(function(){ this.open(e.target); }, this.showDelay);
 			}
 		},
 
