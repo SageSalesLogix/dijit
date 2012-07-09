@@ -7,16 +7,8 @@ define([
 	"../../form/ToggleButton"
 ], function(declare, domStyle, kernel, lang, _Plugin, ToggleButton){
 
-/*=====
-	var _Plugin = dijit._editor._Plugin;
-=====*/
-
 	// module:
 	//		dijit/_editor/plugins/ToggleDir
-	// summary:
-	//		This plugin is used to toggle direction of the edited document,
-	//		independent of what direction the whole page is.
-
 
 	kernel.experimental("dijit._editor.plugins.ToggleDir");
 

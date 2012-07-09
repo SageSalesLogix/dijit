@@ -5,20 +5,11 @@ define([
 	"./NumberTextBox"
 ], function(currency, declare, lang, NumberTextBox){
 
-/*=====
-	var NumberTextBox = dijit.form.NumberTextBox;
-=====*/
-
 	// module:
 	//		dijit/form/CurrencyTextBox
-	// summary:
-	//		A validating currency textbox
-
 
 	/*=====
-	declare(
-		"dijit.form.CurrencyTextBox.__Constraints",
-		[dijit.form.NumberTextBox.__Constraints, currency.__FormatOptions, currency.__ParseOptions], {
+	var __Constraints = declare([NumberTextBox.__Constraints, currency.__FormatOptions, currency.__ParseOptions], {
 		// summary:
 		//		Specifies both the rules on valid/invalid values (minimum, maximum,
 		//		number of required decimal places), and also formatting options for
@@ -50,10 +41,10 @@ define([
 		currency: "",
 
 		/*=====
-		// constraints: dijit.form.CurrencyTextBox.__Constraints
+		// constraints: __Constraints
 		//		Despite the name, this parameter specifies both constraints on the input
 		//		(including minimum/maximum allowed values) as well as
-		//		formatting options.  See `dijit.form.CurrencyTextBox.__Constraints` for details.
+		//		formatting options.
 		constraints: {},
 		======*/
 

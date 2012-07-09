@@ -6,22 +6,13 @@ define([
 	"./_DateTimeTextBox"
 ], function(declare, keys, lang, _TimePicker, _DateTimeTextBox){
 
-/*=====
-	var _TimePicker = dijit._TimePicker;
-	var _DateTimeTextBox = dijit.form._DateTimeTextBox;
-=====*/
-
 	// module:
 	//		dijit/form/TimeTextBox
-	// summary:
-	//		A validating, serializable, range-bound time text box with a drop down time picker
 
 
 	/*=====
-	declare(
-		"dijit.form.TimeTextBox.__Constraints",
-		[dijit.form._DateTimeTextBox.__Constraints, dijit._TimePicker.__Constraints]
-	);
+	var __Constraints = declare([_DateTimeTextBox.__Constraints, _TimePicker.__Constraints], {
+	});
 	=====*/
 
 	return declare("dijit.form.TimeTextBox", _DateTimeTextBox, {
@@ -33,7 +24,7 @@ define([
 		_selector: "time",
 
 /*=====
-		// constraints: dijit.form.TimeTextBox.__Constraints
+		// constraints: __Constraints
 		constraints:{},
 =====*/
 

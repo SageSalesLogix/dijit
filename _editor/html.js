@@ -1,6 +1,6 @@
 define([
 	"dojo/_base/array",
-	"dojo/_base/lang", // lang.getObject
+	"dojo/_base/lang", // lang.setObject
 	"dojo/sniff" // has("ie")
 ], function(array, lang, has){
 
@@ -9,13 +9,13 @@ define([
 // summary:
 //		HTML serialization utility functions used by editor
 
-var exports = lang.getObject("dijit._editor", true);
-/*===== exports = dijit._editor; =====*/
+var exports = {};
+lang.setObject("dijit._editor.html", exports);
 
 var escape = exports.escapeXml = function(/*String*/ str, /*Boolean?*/ noSingleQuotes){
 	// summary:
-	//		Adds escape sequences for special characters in XML: &<>"'
-	//		Optionally skips escapes for single quotes
+	//		Adds escape sequences for special characters in XML: `&<>"'`.
+	//		Optionally skips escapes for single quotes.
 	str = str.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;");
 	if(!noSingleQuotes){
 		str = str.replace(/'/gm, "&#39;");

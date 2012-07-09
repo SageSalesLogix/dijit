@@ -3,13 +3,12 @@ define([
 	"dojo/dom-construct", // domConstruct.create
 	"dojo/has",
 	"dojo/_base/lang", // lang.hitch
-	"dojo/_base/window" // win.body
-], function(declare, domConstruct, has, lang, win){
+	"dojo/_base/window", // win.body
+	"../Viewport"
+], function(declare, domConstruct, has, lang, win, Viewport){
 
 	// module:
 	//		dijit/form/_ExpandingTextAreaMixin
-	// summary:
-	//		Mixin for textarea widgets to add auto-expanding capability
 
 	// feature detection, true for mozilla and webkit
 	has.add("textarea-needs-help-shrinking", function(){
@@ -41,6 +40,7 @@ define([
 			this.connect(textarea, "onscroll", "_resizeLater");
 			this.connect(textarea, "onresize", "_resizeLater");
 			this.connect(textarea, "onfocus", "_resizeLater");
+			this.own(Viewport.on("resize", lang.hitch(this, "_resizeLater")));
 			textarea.style.overflowY = "hidden";
 			this._estimateHeight();
 			this._resizeLater();

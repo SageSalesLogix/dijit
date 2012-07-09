@@ -9,31 +9,10 @@ define([
 	"dojo/text!./templates/DropDownBox.html"
 ], function(date, locale, stamp, declare, lang, RangeBoundTextBox, _HasDropDown, template){
 
-/*=====
-	var _HasDropDown = dijit._HasDropDown;
-	var RangeBoundTextBox = dijit.form.RangeBoundTextBox;
-=====*/
-
 	// module:
 	//		dijit/form/_DateTimeTextBox
-	// summary:
-	//		Base class for validating, serializable, range-bound date or time text box.
-
 
 	new Date("X"); // workaround for #11279, new Date("") == NaN
-
-	/*=====
-	declare(
-		"dijit.form._DateTimeTextBox.__Constraints",
-		[RangeBoundTextBox.__Constraints, locale.__FormatOptions], {
-		// summary:
-		//		Specifies both the rules on valid/invalid values (first/last date/time allowed),
-		//		and also formatting options for how the date/time is displayed.
-		// example:
-		//		To restrict to dates within 2004, displayed in a long format like "December 25, 2005":
-		//	|		{min:'2004-01-01',max:'2004-12-31', formatLength:'long'}
-	});
-	=====*/
 
 	var _DateTimeTextBox = declare("dijit.form._DateTimeTextBox", [RangeBoundTextBox, _HasDropDown], {
 		// summary:
@@ -45,8 +24,13 @@ define([
 		//		Set this textbox to display a down arrow button, to open the drop down list.
 		hasDownArrow: true,
 
+		// Set classes like dijitDownArrowButtonHover depending on mouse action over button node
+		cssStateNodes: {
+			"_buttonNode": "dijitDownArrowButton"
+		},
+
 		/*=====
-		// constraints: dijit.form._DateTimeTextBox.__Constraints
+		// constraints: _DateTimeTextBox.__Constraints
 		//		Despite the name, this parameter specifies both constraints on the input
 		//		(including starting/ending dates/times allowed) as well as
 		//		formatting options like whether the date is displayed in long (ex: December 25, 2005)
@@ -59,9 +43,12 @@ define([
 		pattern: locale.regexp,
 
 		// datePackage: String
-		//		JavaScript namespace to find calendar routines.	 Uses Gregorian calendar routines
-		//		at dojo.date, by default.
-		datePackage: date,
+		//		JavaScript namespace to find calendar routines.	 If unspecified, uses Gregorian calendar routines
+		//		at dojo/date and dojo/date/locale.
+		datePackage: "",
+		//		TODO: for 2.0, replace datePackage with dateModule and dateLocalModule attributes specifying MIDs,
+		//		or alternately just get rid of this completely and tell user to use module ID remapping
+		//		via require
 
 		postMixInProperties: function(){
 			this.inherited(arguments);
@@ -78,7 +65,7 @@ define([
 		// flag to _HasDropDown to make drop down Calendar width == <input> width
 		forceWidth: true,
 
-		format: function(/*Date*/ value, /*dojo.date.locale.__FormatOptions*/ constraints){
+		format: function(/*Date*/ value, /*locale.__FormatOptions*/ constraints){
 			// summary:
 			//		Formats the value as a Date, according to specified locale (second argument)
 			// tags:
@@ -87,7 +74,7 @@ define([
 			return this.dateLocaleModule.format(value, constraints);
 		},
 
-		"parse": function(/*String*/ value, /*dojo.date.locale.__FormatOptions*/ constraints){
+		"parse": function(/*String*/ value, /*locale.__FormatOptions*/ constraints){
 			// summary:
 			//		Parses as string as a Date, according to constraints
 			// tags:
@@ -127,13 +114,18 @@ define([
 		//		Subclass must specify this.
 		_selector: "",
 
-		constructor: function(/*Object*/ args){
-			this.datePackage = args.datePackage || this.datePackage;
-			this.dateFuncObj = typeof this.datePackage == "string" ?
-				lang.getObject(this.datePackage, false) :// "string" part for back-compat, remove for 2.0
-				this.datePackage;
-			this.dateClassObj = this.dateFuncObj.Date || Date;
-			this.dateLocaleModule = lang.getObject("locale", false, this.dateFuncObj);
+		constructor: function(params /*===== , srcNodeRef =====*/){
+			// summary:
+			//		Create the widget.
+			// params: Object|null
+			//		Hash of initialization parameters for widget, including scalar values (like title, duration etc.)
+			//		and functions, typically callbacks like onClick.
+			// srcNodeRef: DOMNode|String?
+			//		If a srcNodeRef (DOM node) is specified, replace srcNodeRef with my generated DOM tree
+
+			this.dateModule = params.datePackage ? lang.getObject(params.datePackage, false) : date;
+			this.dateClassObj = this.dateModule.Date || Date;
+			this.dateLocaleModule = params.datePackage ? lang.getObject(params.datePackage+".locale", false) : locale;
 			this._set('pattern', this.dateLocaleModule.regexp);
 			this._invalidDate = this.constructor.prototype.value.toString();
 		},
@@ -227,17 +219,15 @@ define([
 				lang: textBox.lang,
 				value: value,
 				currentFocus: !this._isInvalidDate(value) ? value : this.dropDownDefaultValue,
-					constraints: textBox.constraints,
+				constraints: textBox.constraints,
 				filterString: textBox.filterString, // for TimeTextBox, to filter times shown
-
-					datePackage: textBox.datePackage,
-
-					isDisabledDate: function(/*Date*/ date){
-						// summary:
-						//	disables dates outside of the min/max of the _DateTimeTextBox
-						return !textBox.rangeCheck(date, textBox.constraints);
-					}
-				});
+				datePackage: textBox.params.datePackage,
+				isDisabledDate: function(/*Date*/ date){
+					// summary:
+					//		disables dates outside of the min/max of the _DateTimeTextBox
+					return !textBox.rangeCheck(date, textBox.constraints);
+				}
+			});
 
 			this.inherited(arguments);
 		},
@@ -250,6 +240,18 @@ define([
 			this._setValueAttr(this.parse(value, this.constraints), priorityChange, value);
 		}
 	});
+
+
+	/*=====
+	 _DateTimeTextBox.__Constraints = declare([RangeBoundTextBox.__Constraints, locale.__FormatOptions], {
+		 // summary:
+		 //		Specifies both the rules on valid/invalid values (first/last date/time allowed),
+		 //		and also formatting options for how the date/time is displayed.
+		 // example:
+		 //		To restrict to dates within 2004, displayed in a long format like "December 25, 2005":
+		 //	|		{min:'2004-01-01',max:'2004-12-31', formatLength:'long'}
+	 });
+	 =====*/
 
 	return _DateTimeTextBox;
 });

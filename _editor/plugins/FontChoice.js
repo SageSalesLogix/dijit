@@ -12,24 +12,13 @@ define([
 	"../../form/FilteringSelect",
 	"../_Plugin",
 	"../range",
-	"../selection",
 	"dojo/i18n!../nls/FontChoice"
 ], function(array, declare, domConstruct, i18n, lang, MemoryStore,
-	registry, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin, FilteringSelect, _Plugin, rangeapi, selectionapi){
-
-/*=====
-	var _Plugin = dijit._editor._Plugin;
-	var _Widget = dijit._Widget;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _WidgetsInTemplateMixin = dijit._WidgetsInTemplateMixin;
-	var FilteringSelect = dijit.form.FilteringSelect;
-=====*/
+	registry, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin, FilteringSelect, _Plugin, rangeapi){
 
 
 // module:
 //		dijit/_editor/plugins/FontChoice
-// summary:
-//		fontchoice, fontsize, and formatblock editor plugins
 
 
 var _FontDropDown = declare("dijit._editor.plugins._FontDropDown",
@@ -433,16 +422,11 @@ var FontChoice = declare("dijit._editor.plugins.FontChoice", _Plugin,{
 	// description:
 	//		The commands provided by this plugin are:
 	//
-	//		* fontName
-	//	|		Provides a drop down to select from a list of font names
-	//		* fontSize
-	//	|		Provides a drop down to select from a list of font sizes
-	//		* formatBlock
-	//	|		Provides a drop down to select from a list of block styles
-	//	|
-	//
-	//		which can easily be added to an editor by including one or more of the above commands
-	//		in the `plugins` attribute as follows:
+	//		- fontName: Provides a drop down to select from a list of font names
+	//		- fontSize: Provides a drop down to select from a list of font sizes
+	//		- formatBlock: Provides a drop down to select from a list of block styles
+	//		  which can easily be added to an editor by including one or more of the above commands
+	//		  in the `plugins` attribute as follows:
 	//
 	//	|	plugins="['fontName','fontSize',...]"
 	//

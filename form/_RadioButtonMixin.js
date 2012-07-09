@@ -10,15 +10,13 @@ define([
 
 	// module:
 	//		dijit/form/_RadioButtonMixin
-	// summary:
-	//		Mixin to provide widget functionality for an HTML radio button
 
 	return declare("dijit.form._RadioButtonMixin", null, {
 		// summary:
 		//		Mixin to provide widget functionality for an HTML radio button
 
 		// type: [private] String
-		//		type attribute on <input> node.
+		//		type attribute on `<input>` node.
 		//		Users should not change this value.
 		type: "radio",
 

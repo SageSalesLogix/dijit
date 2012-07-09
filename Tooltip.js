@@ -20,16 +20,8 @@ define([
 ], function(array, declare, fx, dom, domClass, domGeometry, domStyle, lang, mouse, on, has,
 			manager, place, _Widget, _TemplatedMixin, BackgroundIframe, template, dijit){
 
-/*=====
-	var _Widget = dijit._Widget;
-	var BackgroundIframe = dijit.BackgroundIframe;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-=====*/
-
 	// module:
 	//		dijit/Tooltip
-	// summary:
-	//		Defines dijit.Tooltip widget (to display a tooltip), showTooltip()/hideTooltip(), and _MasterTooltip
 
 
 	// TODO: Tooltip should really share more positioning code with TooltipDialog, like:
@@ -71,7 +63,7 @@ define([
 			//		(To left if there's no space on the right, or if rtl == true)
 			// innerHTML: String
 			//		Contents of the tooltip
-			// aroundNode: DomNode || dijit.__Rectangle
+			// aroundNode: DomNode || place.__Rectangle
 			//		Specifies that tooltip should be next to this node / area
 			// position: String[]?
 			//		List of positions to try to position tooltip (ex: ["right", "above"])
@@ -130,17 +122,8 @@ define([
 
 			this.connectorNode.style.top = ""; //reset to default
 
-			// Adjust for space taking by tooltip connector.
-			// Take care not to modify the original spaceAvailable arg as that confuses the caller (dijit.place).
 			var heightAvailable = spaceAvailable.h,
 				widthAvailable = spaceAvailable.w;
-			if(aroundCorner.charAt(1) != tooltipCorner.charAt(1)){
-				// left/right tooltip
-				widthAvailable -= this.connectorNode.offsetWidth;
-			}else{
-				// above/below tooltip
-				heightAvailable -= this.connectorNode.offsetHeight;
-			}
 
 			node.className = "dijitTooltip " +
 				{
@@ -159,12 +142,18 @@ define([
 			// reset width; it may have been set by orient() on a previous tooltip show()
 			this.domNode.style.width = "auto";
 
-			// reduce tooltip's width to the amount of width available, so that it doesn't overflow screen
-			var size = domGeometry.getContentBox(this.domNode);
+			// Reduce tooltip's width to the amount of width available, so that it doesn't overflow screen.
+			// Note that sometimes widthAvailable is negative, but we guard against setting style.width to a
+			// negative number since that causes an exception on IE.
+			var size = domGeometry.position(this.domNode);
+			if(has("ie") == 9){
+				// workaround strange IE9 bug where setting width to offsetWidth causes words to wrap
+				size.w += 2;
+			}
 
 			var width = Math.min((Math.max(widthAvailable,1)), size.w);
 
-			this.domNode.style.width = width+"px";
+			domGeometry.setMarginBox(this.domNode, {w: width});
 
 			// Reposition the tooltip connector.
 			if(tooltipCorner.charAt(0) == 'B' && aroundCorner.charAt(0) == 'B'){
@@ -240,7 +229,7 @@ define([
 		
 		_setAutoTextDir: function(/*Object*/node){
 		    // summary:
-		    //	    Resolve "auto" text direction for children nodes
+		    //		Resolve "auto" text direction for children nodes
 		    // tags:
 		    //		private
 
@@ -273,7 +262,7 @@ define([
 		//		If position is not specified then dijit.Tooltip.defaultPosition is used.
 		// innerHTML: String
 		//		Contents of the tooltip
-		// aroundNode: dijit.__Rectangle
+		// aroundNode: place.__Rectangle
 		//		Specifies that tooltip should be next to this node / area
 		// position: String[]?
 		//		List of positions to try to position tooltip (ex: ["right", "above"])
@@ -304,6 +293,7 @@ define([
 	var Tooltip = declare("dijit.Tooltip", _Widget, {
 		// summary:
 		//		Pops up a tooltip (a help message) when you hover over a node.
+		//		Also provides static show() and hide() methods that can be used without instantiating a dijit/Tooltip.
 
 		// label: String
 		//		Text to display in the tooltip.
@@ -351,7 +341,7 @@ define([
 
 			// Make connections
 			this._connections = array.map(this._connectIds, function(id){
-				var node = dom.byId(id),
+				var node = dom.byId(id, this.ownerDocument),
 					selector = this.selector,
 					delegatedEvent = selector ?
 						function(eventType){ return on.selector(selector, eventType); } :
@@ -525,12 +515,12 @@ define([
 	//		the Tooltip widget or *TextBox widget itself.  It's an array of strings with the values
 	//		possible for `dijit/place::around()`.   The recommended values are:
 	//
-	//			* before-centered: centers tooltip to the left of the anchor node/widget, or to the right
-	//				 in the case of RTL scripts like Hebrew and Arabic
-	//			* after-centered: centers tooltip to the right of the anchor node/widget, or to the left
-	//				 in the case of RTL scripts like Hebrew and Arabic
-	//			* above-centered: tooltip is centered above anchor node
-	//			* below-centered: tooltip is centered above anchor node
+	//		- before-centered: centers tooltip to the left of the anchor node/widget, or to the right
+	//		  in the case of RTL scripts like Hebrew and Arabic
+	//		- after-centered: centers tooltip to the right of the anchor node/widget, or to the left
+	//		  in the case of RTL scripts like Hebrew and Arabic
+	//		- above-centered: tooltip is centered above anchor node
+	//		- below-centered: tooltip is centered above anchor node
 	//
 	//		The list is positions is tried, in order, until a position is found where the tooltip fits
 	//		within the viewport.

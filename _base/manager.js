@@ -1,9 +1,10 @@
 define([
 	"dojo/_base/array",
 	"dojo/_base/config", // defaultDuration
+	/*===== "dojo/_base/lang", =====*/
 	"../registry",
 	"../main"	// for setting exports to dijit namespace
-], function(array, config, registry, dijit){
+], function(array, config, /*===== lang, =====*/ registry, dijit){
 
 	// module:
 	//		dijit/_base/manager
@@ -16,7 +17,7 @@ define([
 		// summary:
 		//		Returns a widget by it's id, or if passed a widget, no-op (like dom.byId())
 		// id: String|dijit._Widget
-		return registry.byId(id); // dijit._Widget
+		return registry.byId(id); // dijit/_WidgetBase
 	};
 
 	dijit.getUniqueId = function(widgetType){
@@ -45,7 +46,7 @@ define([
 		// summary:
 		//		Returns the widget corresponding to the given DOMNode
 		// node: DOMNode
-		return registry.byNode(node); // dijit._Widget
+		return registry.byNode(node); // dijit/_WidgetBase
 	};
 
 	dijit.getEnclosingWidget = function(node){
@@ -60,17 +61,17 @@ define([
 		dijit[name] = registry[name];
 	});
 
-	/*=====
-	dojo.mixin(dijit, {
-		// defaultDuration: Integer
-		//		The default fx.animation speed (in ms) to use for all Dijit
-		//		transitional fx.animations, unless otherwise specified
-		//		on a per-instance basis. Defaults to 200, overrided by
-		//		`djConfig.defaultDuration`
-		defaultDuration: 200
-	});
-	=====*/
 	dijit.defaultDuration = config["defaultDuration"] || 200;
+	/*=====
+	 lang.mixin(dijit, {
+		 // defaultDuration: Integer
+		 //		The default fx.animation speed (in ms) to use for all Dijit
+		 //		transitional fx.animations, unless otherwise specified
+		 //		on a per-instance basis. Defaults to 200, overrided by
+		 //		`djConfig.defaultDuration`
+		 defaultDuration: 200
+	 });
+	 =====*/
 
 	return dijit;
 });

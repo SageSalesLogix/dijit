@@ -18,9 +18,6 @@ define([
 
 	// module:
 	//		dijit/form/_AutoCompleterMixin
-	// summary:
-	//		A mixin that implements the base functionality for `dijit.form.ComboBox`/`dijit.form.FilteringSelect`
-
 
 	return declare("dijit.form._AutoCompleterMixin", SearchMixin, {
 		// summary:
@@ -127,11 +124,12 @@ define([
 			this._abortQuery();
 
 			// _HasDropDown will do some of the work:
-			//		1. when drop down is not yet shown:
-			//			- if user presses the down arrow key, call loadDropDown()
-			//		2. when drop down is already displayed:
-			//			- on ESC key, call closeDropDown()
-			//			- otherwise, call dropDown.handleKey() to process the keystroke
+			//
+			//	1. when drop down is not yet shown:
+			//		- if user presses the down arrow key, call loadDropDown()
+			//	2. when drop down is already displayed:
+			//		- on ESC key, call closeDropDown()
+			//		- otherwise, call dropDown.handleKey() to process the keystroke
 			this.inherited(arguments);
 
 			if(evt.altKey || evt.ctrlKey || evt.metaKey){ return; } // don't process keys with modifiers  - but we want shift+TAB
@@ -254,7 +252,7 @@ define([
 			// textbox would be changed to "California" and "ifornia" would be
 			// highlighted.
 
-			var nodes = this.dropDown.createOptions(
+			this.dropDown.createOptions(
 				results,
 				options,
 				lang.hitch(this, "_getMenuLabelFromItem")
@@ -281,7 +279,7 @@ define([
 				// it does not make sense to autocomplete
 				// if they are just previewing the options available.
 				&& !/^[*]+$/.test(query[this.searchAttr].toString())){
-					this._announceOption(nodes[1]); // 1st real item
+					this._announceOption(this.dropDown.containerNode.firstChild.nextSibling); // 1st real item
 			}
 		},
 
@@ -382,9 +380,10 @@ define([
 				this.item = undefined;
 				this.value = '';
 			}else{
+				var item = this.dropDown.items[node.getAttribute("item")];
 				newValue = (this.store._oldAPI ?	// remove getValue() for 2.0 (old dojo.data API)
-					this.store.getValue(node.item, this.searchAttr) : node.item[this.searchAttr]).toString();
-				this.set('item', node.item, false, newValue);
+					this.store.getValue(item, this.searchAttr) : item[this.searchAttr]).toString();
+				this.set('item', item, false, newValue);
 			}
 			// get the text that the user manually entered (cut off autocompleted text)
 			this.focusNode.value = this.focusNode.value.substring(0, this._lastInput.length);
@@ -523,7 +522,7 @@ define([
 		_escapeHtml: function(/*String*/ str){
 			// TODO Should become dojo.html.entities(), when exists use instead
 			// summary:
-			//		Adds escape sequences for special characters in XML: &<>"'
+			//		Adds escape sequences for special characters in XML: `&<>"'`
 			str = String(str).replace(/&/gm, "&amp;").replace(/</gm, "&lt;")
 				.replace(/>/gm, "&gt;").replace(/"/gm, "&quot;"); //balance"
 			return str; // string
@@ -536,9 +535,13 @@ define([
 			this.inherited(arguments);
 		},
 
-		labelFunc: function(/*item*/ item, /*dojo.store.api.Store*/ store){
+		labelFunc: function(item, store){
 			// summary:
 			//		Computes the label to display based on the dojo.data store item.
+			// item: Object
+			//		The item from the store
+			// store: dojo/store/api/Store
+			//		The store.
 			// returns:
 			//		The label that the ComboBox should display
 			// tags:

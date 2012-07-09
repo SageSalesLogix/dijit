@@ -16,17 +16,8 @@ define([
 ], function(array, declare, domClass, event, keys, lang, on,
 			focus, registry, _Widget, _TemplatedMixin, _Container, ToggleButton){
 
-/*=====
-	var _Widget = dijit._Widget;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _Container = dijit._Container;
-	var ToggleButton = dijit.form.ToggleButton;
-=====*/
-
 	// module:
 	//		dijit/layout/StackController
-	// summary:
-	//		Set of buttons to select a page in a `dijit.layout.StackContainer`
 
 	var StackButton = declare("dijit.layout._StackButton", ToggleButton, {
 		// summary:
@@ -81,7 +72,15 @@ define([
 		//		CSS class of [x] close icon, used by event delegation code to tell when close button was clicked
 		buttonWidgetCloseClass: "dijitStackCloseButton",
 
-		constructor: function(){
+		constructor: function(params /*===== , srcNodeRef =====*/){
+			// summary:
+			//		Create the widget.
+			// params: Object|null
+			//		Hash of initialization parameters for widget, including scalar values (like title, duration etc.)
+			//		and functions, typically callbacks like onClick.
+			// srcNodeRef: DOMNode|String?
+			//		If a srcNodeRef (DOM node) is specified, replace srcNodeRef with my generated DOM tree
+
 			this.pane2button = {};		// mapping from pane id to buttons
 		},
 
@@ -100,15 +99,16 @@ define([
 			// No need to worry about ENTER/SPACe key handling: tabs are selected via left/right arrow keys,
 			// and closed via shift-F10 (to show the close menu).
 			this.connect(this.containerNode, 'click', function(evt){
-				var button = registry.getEnclosingWidget(evt.target),
-					page = button.page;
-				for(var target = evt.target; target !== this.containerNode; target = target.parentNode){
-					if(domClass.contains(target, this.buttonWidgetCloseClass)){
-						this.onCloseButtonClick(button);
-						break;
-					}else if(domClass.contains(target, this.buttonWidgetClass)){
-						this.onButtonClick(button);
-						break;
+				var button = registry.getEnclosingWidget(evt.target);
+				if(button != this.containerNode && !button.disabled){
+					for(var target = evt.target; target !== this.containerNode; target = target.parentNode){
+						if(domClass.contains(target, this.buttonWidgetCloseClass)){
+							this.onCloseButtonClick(button);
+							break;
+						}else if(domClass.contains(target, this.buttonWidgetClass)){
+							this.onButtonClick(button);
+							break;
+						}
 					}
 				}
 			});
@@ -134,7 +134,8 @@ define([
 					"showtitle": "showLabel",
 					"iconclass": "iconClass",
 					"closable": "closeButton",
-					"tooltip": "title"
+					"tooltip": "title",
+					"disabled": "disabled"
 				},
 				connectFunc = function(attr, buttonAttr){
 					return on(containerNode, "attrmodified-" + attr, function(evt){
@@ -145,7 +146,7 @@ define([
 					});
 				};
 			for(var attr in paneToButtonAttr){
-				this._adoptHandles(connectFunc(attr, paneToButtonAttr[attr]));
+				this.own(connectFunc(attr, paneToButtonAttr[attr]));
 			}
 		},
 
@@ -156,7 +157,7 @@ define([
 			this.inherited(arguments);
 		},
 
-		onAddChild: function(/*dijit._Widget*/ page, /*Integer?*/ insertIndex){
+		onAddChild: function(/*dijit/_WidgetBase*/ page, /*Integer?*/ insertIndex){
 			// summary:
 			//		Called whenever a page is added to the container.
 			//		Create button corresponding to the page.
@@ -169,6 +170,8 @@ define([
 			var button = new Cls({
 				id: this.id + "_" + page.id,
 				label: page.title,
+				disabled: page.disabled,
+				ownerDocument: this.ownerDocument,
 				dir: page.dir,
 				lang: page.lang,
 				textDir: page.textDir,
@@ -191,7 +194,7 @@ define([
 			}
 		},
 
-		onRemoveChild: function(/*dijit._Widget*/ page){
+		onRemoveChild: function(/*dijit/_WidgetBase*/ page){
 			// summary:
 			//		Called whenever a page is removed from the container.
 			//		Remove the button corresponding to the page.
@@ -209,7 +212,7 @@ define([
 			delete page.controlButton;
 		},
 
-		onSelectChild: function(/*dijit._Widget*/ page){
+		onSelectChild: function(/*dijit/_WidgetBase*/ page){
 			// summary:
 			//		Called when a page has been selected in the StackContainer, either by me or by another StackController
 			// tags:
@@ -231,7 +234,7 @@ define([
 			container.containerNode.setAttribute("aria-labelledby", newButton.id);
 		},
 
-		onButtonClick: function(/*dijit._Widget*/ button){
+		onButtonClick: function(/*dijit/_WidgetBase*/ button){
 			// summary:
 			//		Called whenever one of my child buttons is pressed in an attempt to select a page
 			// tags:
@@ -251,7 +254,7 @@ define([
 			container.selectChild(page);
 		},
 
-		onCloseButtonClick: function(/*dijit._Widget*/ button){
+		onCloseButtonClick: function(/*dijit/_WidgetBase*/ button){
 			// summary:
 			//		Called whenever one of my child buttons [X] is pressed in an attempt to close a page
 			// tags:
@@ -278,10 +281,18 @@ define([
 			if(!this.isLeftToRight() && (!this.tabPosition || /top|bottom/.test(this.tabPosition))){ forward = !forward; }
 			// find currently focused button in children array
 			var children = this.getChildren();
-			var current = array.indexOf(children, this.pane2button[this._currentChild.id]);
-			// pick next button to focus on
-			var offset = forward ? 1 : children.length - 1;
-			return children[ (current + offset) % children.length ]; // dijit._Widget
+			var idx = array.indexOf(children, this.pane2button[this._currentChild.id]),
+				current = children[idx];
+
+			// Pick next/previous non-disabled button to focus on.   If we get back to the original button it means
+			// that all buttons must be disabled, so return current child to avoid an infinite loop.
+			var child;
+			do{
+				idx = (idx + (forward ? 1 : children.length - 1)) % children.length;
+				child = children[idx];
+			}while(child.disabled && child != current);
+
+			return child; // dijit/_WidgetBase
 		},
 
 		onkeypress: function(/*Event*/ e){
@@ -310,10 +321,26 @@ define([
 						if(e.ctrlKey){ forward = true; }
 						break;
 					case keys.HOME:
-					case keys.END:
+						// Navigate to first non-disabled child
 						var children = this.getChildren();
-						if(children && children.length){
-							this.onButtonClick(children[e.charOrCode == keys.HOME ? 0 : children.length-1]);
+						for(var idx = 0; idx < children.length; idx++){
+							var child = children[idx];
+							if(!child.disabled){
+								this.onButtonClick(child);
+								break;
+							}
+						}
+						event.stop(e);
+						break;
+					case keys.END:
+						// Navigate to last non-disabled child
+						var children = this.getChildren();
+						for(var idx = children.length-1; idx >= 0; idx--){
+							var child = children[idx];
+							if(!child.disabled){
+								this.onButtonClick(child);
+								break;
+							}
 						}
 						event.stop(e);
 						break;

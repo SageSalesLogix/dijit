@@ -7,16 +7,8 @@ define([
 	"./ComboBoxMixin"
 ], function(filter, declare, lang, when, MappedTextBox, ComboBoxMixin){
 
-/*=====
-	var MappedTextBox = dijit.form.MappedTextBox;
-	var ComboBoxMixin = dijit.form.ComboBoxMixin;
-=====*/
-
 	// module:
 	//		dijit/form/FilteringSelect
-	// summary:
-	//		An enhanced version of the HTML SELECT tag, populated dynamically
-
 
 	return declare("dijit.form.FilteringSelect", [MappedTextBox, ComboBoxMixin], {
 		// summary:
@@ -33,17 +25,19 @@ define([
 		//		attribute on 1 of the child OPTION tags.
 		//
 		//		Similar features:
-		//			- There is a drop down list of possible values.
-		//			- You can only enter a value from the drop down list.  (You can't
-		//				enter an arbitrary value.)
-		//			- The value submitted with the form is the hidden value (ex: CA),
-		//				not the displayed value a.k.a. label (ex: California)
+		//
+		//		- There is a drop down list of possible values.
+		//		- You can only enter a value from the drop down list.  (You can't
+		//			enter an arbitrary value.)
+		//		- The value submitted with the form is the hidden value (ex: CA),
+		//			not the displayed value a.k.a. label (ex: California)
 		//
 		//		Enhancements over plain HTML version:
-		//			- If you type in some text then it will filter down the list of
-		//				possible values in the drop down list.
-		//			- List can be specified either as a static list or via a javascript
-		//				function (that can get the list from a server)
+		//
+		//		- If you type in some text then it will filter down the list of
+		//			possible values in the drop down list.
+		//		- List can be specified either as a static list or via a javascript
+		//			function (that can get the list from a server)
 
 		// required: Boolean
 		//		True (default) if user is required to enter a value into this field.
@@ -57,7 +51,7 @@ define([
 
 		isValid: function(){
 			// Overrides ValidationTextBox.isValid()
-			return this.item || (!this.required && this.get('displayedValue') == ""); // #5974
+			return !!this.item || (!this.required && this.get('displayedValue') == ""); // #5974
 		},
 
 		_refreshState: function(){

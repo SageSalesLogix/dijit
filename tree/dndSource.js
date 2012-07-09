@@ -18,30 +18,17 @@ define([
 //		Handles drag and drop operations (as a source or a target) for `dijit.Tree`
 
 /*=====
-dijit.tree.__SourceArgs = function(){
+var __Item = {
 	// summary:
-	//		A dict of parameters for Tree source configuration.
-	// isSource: Boolean?
-	//		Can be used as a DnD source. Defaults to true.
-	// accept: String[]
-	//		List of accepted types (text strings) for a target; defaults to
-	//		["text", "treeNode"]
-	// copyOnly: Boolean?
-	//		Copy items, if true, use a state of Ctrl key otherwise,
-	// dragThreshold: Number
-	//		The move delay in pixels before detecting a drag; 0 by default
-	// betweenThreshold: Integer
-	//		Distance from upper/lower edge of node to allow drop to reorder nodes
-	this.isSource = isSource;
-	this.accept = accept;
-	this.autoSync = autoSync;
-	this.copyOnly = copyOnly;
-	this.dragThreshold = dragThreshold;
-	this.betweenThreshold = betweenThreshold;
-}
+	//		New item to be added to the Tree, like:
+	// id: Anything
+	id: "",
+	// name: String
+	name: ""
+};
 =====*/
 
-return declare("dijit.tree.dndSource", _dndSelector, {
+var dndSource = declare("dijit.tree.dndSource", _dndSelector, {
 	// summary:
 	//		Handles drag and drop operations (as a source or a target) for `dijit.Tree`
 
@@ -69,7 +56,7 @@ return declare("dijit.tree.dndSource", _dndSelector, {
 	// Flag used by Avatar.js to signal to generate text node when dragging
 	generateText: true,
 
-	constructor: function(/*dijit.Tree*/ tree, /*dijit.tree.__SourceArgs*/ params){
+	constructor: function(/*dijit/Tree*/ tree, /*dijit/tree/dndSource*/ params){
 		// summary:
 		//		a constructor of the Tree DnD Source
 		// tags:
@@ -118,7 +105,7 @@ return declare("dijit.tree.dndSource", _dndSelector, {
 	checkAcceptance: function(/*===== source, nodes =====*/){
 		// summary:
 		//		Checks if the target can accept nodes from this source
-		// source: dijit.tree.dndSource
+		// source: dijit/tree/dndSource
 		//		The source which provides items
 		// nodes: DOMNode[]
 		//		Array of DOM nodes corresponding to nodes being dropped, dijitTreeRow nodes if
@@ -304,7 +291,7 @@ return declare("dijit.tree.dndSource", _dndSelector, {
 		// target: DOMNode
 		//		The dijitTreeRoot DOM node inside of the TreeNode that we are dropping on to
 		//		Use dijit.getEnclosingWidget(target) to get the TreeNode.
-		// source: dijit.tree.dndSource
+		// source: dijit/tree/dndSource
 		//		The (set of) nodes we are dropping
 		// position: String
 		//		"over", "before", or "after"
@@ -318,7 +305,7 @@ return declare("dijit.tree.dndSource", _dndSelector, {
 		// summary:
 		//		Topic event processor for /dnd/source/over, called when detected a current source.
 		// source: Object
-		//		The dijit.tree.dndSource / dojo.dnd.Source which has the mouse over it
+		//		The dijit/tree/dndSource / dojo/dnd/Source which has the mouse over it
 		// tags:
 		//		private
 		if(this != source){
@@ -333,7 +320,7 @@ return declare("dijit.tree.dndSource", _dndSelector, {
 		// summary:
 		//		Topic event processor for /dnd/start, called to initiate the DnD operation
 		// source: Object
-		//		The dijit.tree.dndSource / dojo.dnd.Source which is providing the items
+		//		The dijit/tree/dndSource / dojo/dnd/Source which is providing the items
 		// nodes: DomNode[]
 		//		The list of transferred items, dndTreeNode nodes if dragging from a Tree
 		// copy: Boolean
@@ -366,13 +353,9 @@ return declare("dijit.tree.dndSource", _dndSelector, {
 		//		pairs to be passed to Tree.model.newItem().  Returns array of those hashes.
 		// nodes: DomNode[]
 		// target: DomNode
-		// source: dojo.dnd.Source
-		// returns: Object[]
-		//		Array of name/value hashes for each new item to be added to the Tree, like:
-		// |	[
-		// |		{ id: 123, label: "apple", foo: "bar" },
-		// |		{ id: 456, label: "pear", zaz: "bam" }
-		// |	]
+		// source: dojo/dnd/Source
+		// returns: __Item[]
+		//		Array of name/value hashes for each new item to be added to the Tree
 		// tags:
 		//		extension
 
@@ -394,7 +377,7 @@ return declare("dijit.tree.dndSource", _dndSelector, {
 		//		Updates data store items according to where node was dragged from and dropped
 		//		to.   The tree will then respond to those data store updates and redraw itself.
 		// source: Object
-		//		The dijit.tree.dndSource / dojo.dnd.Source which is providing the items
+		//		The dijit/tree/dndSource / dojo/dnd/Source which is providing the items
 		// nodes: DomNode[]
 		//		The list of transferred items, dndTreeNode nodes if dragging from a Tree
 		// copy: Boolean
@@ -574,4 +557,9 @@ return declare("dijit.tree.dndSource", _dndSelector, {
 	}
 });
 
+/*=====
+dndSource.__Item = __Item;
+=====*/
+
+return dndSource;
 });

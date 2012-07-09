@@ -13,8 +13,6 @@ define([
 
 	// module:
 	//		dijit/form/_SearchMixin
-	// summary:
-	//		A mixin that implements the base functionality to search a store based upon user-entered text such as with `dijit.form.ComboBox`/`dijit.form.FilteringSelect`
 
 
 	return declare("dijit.form._SearchMixin", null, {
@@ -29,7 +27,8 @@ define([
 		pageSize: Infinity,
 
 		// store: [const] dojo.store.api.Store
-		//		Reference to data provider object used by this ComboBox
+		//		Reference to data provider object used by this ComboBox.
+		//		The store must accept an object hash of properties for its query. See `query` and `queryExpr` for details.
 		store: null,
 
 		// fetchProperties: Object
@@ -41,9 +40,8 @@ define([
 		fetchProperties:{},
 
 		// query: Object
-		//		A query that can be passed to 'store' to initially filter the items,
-		//		before doing further filtering based on `searchAttr` and the key.
-		//		Any reference to the `searchAttr` is ignored.
+		//		A query that can be passed to `store` to initially filter the items.
+		//		ComboBox overwrites any reference to the `searchAttr` and sets it to the `queryExpr` with the user's input substituted.
 		query: {},
 
 		// searchDelay: Integer
@@ -99,6 +97,7 @@ define([
 			//		Handles input (keyboard/paste) events
 			this.inherited(arguments);
 
+			if(this.disabled || this.readOnly){ return; }
 			var key = evt.charOrCode;
 
 			// except for cutting/pasting case - ctrl + x/v
@@ -113,6 +112,7 @@ define([
 				case keys.DELETE:
 				case keys.BACKSPACE:
 					this._prev_key_backspace = true;
+					this._maskValidSubsetError = true;
 					doSearch = true;
 					break;
 
@@ -133,9 +133,19 @@ define([
 			}
 		},
 
-		onSearch: function(/*Object*/ results){
+		onSearch: function(/*===== results, query, options =====*/){
 			// summary:
 			//		Callback when a search completes.
+			//
+			// results: Object
+			//		An array of items from the originating _SearchMixin's store.
+			//
+			// query: Object
+			//		A copy of the originating _SearchMixin's query property.
+			//
+			// options: Object
+			//		The additional parameters sent to the originating _SearchMixin's store, including: start, count, queryOptions.
+			//
 			// tags:
 			//		callback
 		},
@@ -244,7 +254,6 @@ define([
 
 		postMixInProperties: function(){
 			if(!this.store){
-				var srcNodeRef = this.srcNodeRef;
 				var list = this.list;
 				if(list){
 					this.store = registry.byId(list);

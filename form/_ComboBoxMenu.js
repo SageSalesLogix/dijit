@@ -1,34 +1,26 @@
 define([
 	"dojo/_base/declare", // declare
 	"dojo/dom-class", // domClass.add domClass.remove
-	"dojo/dom-construct", // domConstruct.create
 	"dojo/dom-style", // domStyle.get
 	"dojo/keys", // keys.DOWN_ARROW keys.PAGE_DOWN keys.PAGE_UP keys.UP_ARROW
 	"../_WidgetBase",
 	"../_TemplatedMixin",
 	"./_ComboBoxMenuMixin",
 	"./_ListMouseMixin"
-], function(declare, domClass, domConstruct, domStyle, keys,
+], function(declare, domClass, domStyle, keys,
 			_WidgetBase, _TemplatedMixin, _ComboBoxMenuMixin, _ListMouseMixin){
 
-/*=====
-	var _WidgetBase = dijit._WidgetBase;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _ComboBoxMenuMixin = dijit.form._ComboBoxMenuMixin;
-	var _ListMouseMixin = dijit.form._ListMouseMixin;
-=====*/
 
 	// module:
 	//		dijit/form/_ComboBoxMenu
-	// summary:
-	//		Focus-less menu for internal use in `dijit.form.ComboBox`
 
 	return declare("dijit.form._ComboBoxMenu",[_WidgetBase, _TemplatedMixin, _ListMouseMixin, _ComboBoxMenuMixin], {
 		// summary:
 		//		Focus-less menu for internal use in `dijit.form.ComboBox`
-		//              Abstract methods that must be defined externally:
-		//                      onChange: item was explicitly chosen (mousedown somewhere on the menu and mouseup somewhere on the menu)
-		//                      onPage: next(1) or previous(-1) button pressed
+		//		Abstract methods that must be defined externally:
+		//
+		//		- onChange: item was explicitly chosen (mousedown somewhere on the menu and mouseup somewhere on the menu)
+		//		- onPage: next(1) or previous(-1) button pressed
 		// tags:
 		//		private
 

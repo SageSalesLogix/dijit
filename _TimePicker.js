@@ -12,47 +12,20 @@ define([
 	"dojo/_base/lang", // lang.mixin
 	"dojo/sniff", // has(...)
 	"dojo/query", // query
+	"dojo/mouse", // mouse.wheel
 	"./typematic",
 	"./_Widget",
 	"./_TemplatedMixin",
 	"./form/_FormValueWidget",
 	"dojo/text!./templates/TimePicker.html"
-], function(array, ddate, locale, stamp, declare, domClass, domConstruct, event, kernel, keys, lang, has, query,
+], function(array, ddate, locale, stamp, declare, domClass, domConstruct, event, kernel, keys, lang, has, query, mouse,
 			typematic, _Widget, _TemplatedMixin, _FormValueWidget, template){
-
-/*=====
-	var _Widget = dijit._Widget;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _FormValueWidget = dijit.form._FormValueWidget;
-=====*/
 
 	// module:
 	//		dijit/_TimePicker
-	// summary:
-	//		A graphical time picker.
 
 
-	/*=====
-	declare(
-		"dijit._TimePicker.__Constraints",
-		locale.__FormatOptions,
-		{
-			// clickableIncrement: String
-			//		See `dijit._TimePicker.clickableIncrement`
-			clickableIncrement: "T00:15:00",
-
-			// visibleIncrement: String
-			//		See `dijit._TimePicker.visibleIncrement`
-			visibleIncrement: "T01:00:00",
-
-			// visibleRange: String
-			//		See `dijit._TimePicker.visibleRange`
-			visibleRange: "T05:00:00"
-		}
-	);
-	=====*/
-
-	return declare("dijit._TimePicker", [_Widget, _TemplatedMixin], {
+	var TimePicker = declare("dijit._TimePicker", [_Widget, _TemplatedMixin], {
 		// summary:
 		//		A graphical time picker.
 		//		This widget is used internally by other widgets and is not available
@@ -105,7 +78,7 @@ define([
 		_clickableIncrement:1,
 		_totalIncrements:10,
 
-		// constraints: dijit._TimePicker.__Constraints
+		// constraints: TimePicker.__Constraints
 		//		Specifies valid range of times (start time, end time)
 		constraints:{},
 
@@ -248,8 +221,16 @@ define([
 			array.forEach(before.concat(after, moreAfter), function(n){ this.timeMenu.appendChild(n); }, this);
 		},
 
-		constructor: function(){
-			this.constraints = {}; // create instance object
+		constructor: function(/*===== params, srcNodeRef =====*/){
+			// summary:
+			//		Create the widget.
+			// params: Object|null
+			//		Hash of initialization parameters for widget, including scalar values (like title, duration etc.)
+			//		and functions, typically callbacks like onClick.
+			// srcNodeRef: DOMNode|String?
+			//		If a srcNodeRef (DOM node) is specified, replace srcNodeRef with my generated DOM tree
+
+			this.constraints = {};
 		},
 
 		postMixInProperties: function(){
@@ -269,8 +250,8 @@ define([
 
 		postCreate: function(){
 			// assign typematic mouse listeners to the arrow buttons
-			this.connect(this.timeMenu, has("mozilla") ? 'DOMMouseScroll' : "onmousewheel", "_mouseWheeled");
-			this._adoptHandles(
+			this.connect(this.timeMenu, mouse.wheel, "_mouseWheeled");
+			this.own(
 				typematic.addMouseListener(this.upArrow, this, "_onArrowUp", 33, 250),
 				typematic.addMouseListener(this.downArrow, this, "_onArrowDown", 33, 250)
 			);
@@ -361,7 +342,7 @@ define([
 			// summary:
 			//		Notification that a time was selected.  It may be the same as the previous value.
 			// tags:
-			//      public
+			//		public
 		},
 
 		_highlightOption: function(/*node*/ node, /*Boolean*/ highlight){
@@ -418,8 +399,7 @@ define([
 			this._keyboardSelected = null;
 			event.stop(e);
 			// we're not _measuring_ the scroll amount, just direction
-			var scrollAmount = has("mozilla") ? -e.detail : e.wheelDelta;
-			this[(scrollAmount>0 ? "_onArrowUp" : "_onArrowDown")](); // yes, we're making a new dom node every time you mousewheel, or click
+			this[(e.wheelDelta>0 ? "_onArrowUp" : "_onArrowDown")](); // yes, we're making a new dom node every time you mousewheel, or click
 		},
 
 		_onArrowUp: function(count){
@@ -516,4 +496,22 @@ define([
 			return undefined;
 		}
 	});
+
+	/*=====
+	 TimePicker.__Constraints = declare(locale.__FormatOptions, {
+		 // clickableIncrement: String
+		 //		See `dijit._TimePicker.clickableIncrement`
+		 clickableIncrement: "T00:15:00",
+
+		 // visibleIncrement: String
+		 //		See `dijit._TimePicker.visibleIncrement`
+		 visibleIncrement: "T01:00:00",
+
+		 // visibleRange: String
+		 //		See `dijit._TimePicker.visibleRange`
+		 visibleRange: "T05:00:00"
+	 });
+	 =====*/
+
+	return TimePicker;
 });

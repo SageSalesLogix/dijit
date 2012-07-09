@@ -11,7 +11,7 @@ define([
 	"dojo/_base/lang", // lang.hitch
 	"dojo/on",
 	"dojo/sniff", // has("ie"), has("quirks")
-	"dojo/_base/window", // win.body win.doc.documentElement win.doc.frames win.withGlobal
+	"dojo/_base/window", // win.body win.doc.documentElement win.doc.frames
 	"dojo/window", // winUtils.get
 	"./popup",
 	"./DropDownMenu",
@@ -19,14 +19,8 @@ define([
 ], function(require, array, declare, event, dom, domAttr, domGeometry, domStyle, keys, lang, on,
 			has, win, winUtils, pm, DropDownMenu, ready){
 
-/*=====
-	var DropDownMenu = dijit.DropDownMenu;
-=====*/
-
 // module:
 //		dijit/Menu
-// summary:
-//		Includes dijit.Menu widget and base class dijit._MenuBase
 
 // Back compat w/1.6, remove for 2.0
 if(has("dijit-legacy-requires")){
@@ -40,7 +34,18 @@ return declare("dijit.Menu", DropDownMenu, {
 	// summary:
 	//		A context menu you can assign to multiple elements
 
-	constructor: function(){
+	constructor: function(/*===== params, srcNodeRef =====*/){
+		// summary:
+		//		Create the widget.
+		// params: Object|null
+		//		Hash of initialization parameters for widget, including scalar values (like title, duration etc.)
+		//		and functions, typically callbacks like onClick.
+		// srcNodeRef: DOMNode|String?
+		//		If a srcNodeRef (DOM node) is specified:
+		//
+		//		- use srcNodeRef.innerHTML as my contents
+		//		- replace srcNodeRef with my generated DOM tree
+
 		this._bindings = [];
 	},
 
@@ -127,7 +132,7 @@ return declare("dijit.Menu", DropDownMenu, {
 		if(node.tagName.toLowerCase() == "iframe"){
 			var iframe = node,
 				window = this._iframeContentWindow(iframe);
-			cn = win.withGlobal(window, win.body);
+			cn = win.body(window.document);
 		}else{
 			// To capture these events at the top level, attach to <html>, not <body>.
 			// Otherwise right-click context menu just doesn't work.
@@ -185,7 +190,7 @@ return declare("dijit.Menu", DropDownMenu, {
 				// access the <body> node because it's already gone, or at least in a state of limbo
 
 				var window = this._iframeContentWindow(iframe);
-					cn = win.withGlobal(window, win.body);
+					cn = win.body(window.document)
 				binding.connects = doConnects(cn);
 			});
 			if(iframe.addEventListener){
@@ -262,13 +267,11 @@ return declare("dijit.Menu", DropDownMenu, {
 		//		Internal function for opening myself when the user does a right-click or something similar.
 		// args:
 		//		This is an Object containing:
-		//		* target:
-		//			The node that is being clicked
-		//		* iframe:
-		//			If an <iframe> is being clicked, iframe points to that iframe
-		//		* coords:
-		//			Put menu at specified x/y position in viewport, or if iframe is
-		//			specified, then relative to iframe.
+		//
+		//		- target: The node that is being clicked
+		//		- iframe: If an `<iframe>` is being clicked, iframe points to that iframe
+		//		- coords: Put menu at specified x/y position in viewport, or if iframe is
+		//		  specified, then relative to iframe.
 		//
 		//		_openMyself() formerly took the event object, and since various code references
 		//		evt.target (after connecting to _openMyself()), using an Object for parameters

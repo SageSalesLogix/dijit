@@ -19,14 +19,9 @@ define([
 ], function(declare, Deferred, event,dom, domAttr, domClass, domGeometry, domStyle, has, keys, lang, touch,
 			winUtils, registry, focus, popup, _FocusMixin){
 
-/*=====
-	var _FocusMixin = dijit._FocusMixin;
-=====*/
 
 	// module:
 	//		dijit/_HasDropDown
-	// summary:
-	//		Mixin for widgets that need drop down ability.
 
 	return declare("dijit._HasDropDown", _FocusMixin, {
 		// summary:
@@ -83,12 +78,12 @@ define([
 		//		This variable controls the position of the drop down.
 		//		It's an array of strings with the following values:
 		//
-		//			* before: places drop down to the left of the target node/widget, or to the right in
-		//			  the case of RTL scripts like Hebrew and Arabic
-		//			* after: places drop down to the right of the target node/widget, or to the left in
-		//			  the case of RTL scripts like Hebrew and Arabic
-		//			* above: drop down goes above target node
-		//			* below: drop down goes below target node
+		//		- before: places drop down to the left of the target node/widget, or to the right in
+		//		  the case of RTL scripts like Hebrew and Arabic
+		//		- after: places drop down to the right of the target node/widget, or to the left in
+		//		  the case of RTL scripts like Hebrew and Arabic
+		//		- above: drop down goes above target node
+		//		- below: drop down goes below target node
 		//
 		//		The list is positions is tried, in order, until a position is found where the drop down fits
 		//		within the viewport.
@@ -105,8 +100,8 @@ define([
 			//		Callback when the user mousedown's on the arrow icon
 			if(this.disabled || this.readOnly){ return; }
 
-			// Prevent default to stop things like text selection, but don't stop propogation, so that:
-			//		1. TimeTextBox etc. can focusthe <input> on mousedown
+			// Prevent default to stop things like text selection, but don't stop propagation, so that:
+			//		1. TimeTextBox etc. can focus the <input> on mousedown
 			//		2. dropDownButtonActive class applied by _CssStateMixin (on button depress)
 			//		3. user defined onMouseDown handler fires
 			e.preventDefault();
@@ -124,10 +119,11 @@ define([
 			//		a mouseup event.
 			//
 			//		This is useful for the common mouse movement pattern
-			//		with native browser <select> nodes:
-			//			1. mouse down on the select node (probably on the arrow)
-			//			2. move mouse to a menu item while holding down the mouse button
-			//			3. mouse up.  this selects the menu item as though the user had clicked it.
+			//		with native browser `<select>` nodes:
+			//
+			//		1. mouse down on the select node (probably on the arrow)
+			//		2. move mouse to a menu item while holding down the mouse button
+			//		3. mouse up.  this selects the menu item as though the user had clicked it.
 			if(e && this._docHandler){
 				this.disconnect(this._docHandler);
 			}
@@ -168,7 +164,10 @@ define([
 				if(dropDown.focus && dropDown.autoFocus !== false){
 					// Focus the dropdown widget - do it on a delay so that we
 					// don't steal back focus from the dropdown.
-					this.defer(lang.hitch(dropDown, "focus"), 1);
+					this._focusDropDownTimer = this.defer(function(){
+						dropDown.focus();
+						delete this._focusDropDownTimer;
+					});
 				}
 			}else{
 				// The drop down arrow icon probably can't receive focus, but widget itself should get focus.
@@ -424,12 +423,13 @@ define([
 				if(dropDown.startup && !dropDown._started){
 					dropDown.startup(); // this has to be done after being added to the DOM
 				}
-				// Get size of drop down, and determine if vertical scroll bar needed
+				// Get size of drop down, and determine if vertical scroll bar needed.  If no scroll bar needed,
+				// use overflow:visible rather than overflow:hidden so off-by-one errors don't hide drop down border.
 				var mb = domGeometry.getMarginSize(ddNode);
 				var overHeight = (maxHeight && mb.h > maxHeight);
 				domStyle.set(ddNode, {
-					overflowX: "hidden",
-					overflowY: overHeight ? "auto" : "hidden"
+					overflowX: "visible",
+					overflowY: overHeight ? "auto" : "visible"
 				});
 				if(overHeight){
 					mb.h = maxHeight;
@@ -489,6 +489,10 @@ define([
 			// tags:
 			//		protected
 
+			if(this._focusDropDownTimer){
+				this._focusDropDownTimer.remove();
+				delete this._focusDropDownTimer;
+			}
 			if(this._opened){
 				if(focus){ this.focus(); }
 				popup.close(this.dropDown);

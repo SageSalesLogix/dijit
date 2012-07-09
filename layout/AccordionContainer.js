@@ -27,20 +27,8 @@ define([
 			keys, lang, has, topic, focus, manager, ready,
 			_Widget, _Container, _TemplatedMixin, _CssStateMixin, StackContainer, ContentPane, template){
 
-/*=====
-	var _Widget = dijit._Widget;
-	var _Container = dijit._Container;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _CssStateMixin = dijit._CssStateMixin;
-	var StackContainer = dijit.layout.StackContainer;
-	var ContentPane = dijit.layout.ContentPane;
-=====*/
-
 	// module:
 	//		dijit/layout/AccordionContainer
-	// summary:
-	//		Holds a set of panes where every pane's title is visible, but only one pane's content is visible at a time,
-	//		and switching between panes is visualized by sliding the other panes up/down.
 
 
 	// Design notes:
@@ -150,7 +138,7 @@ define([
 =====*/
 
 /*=====
-		// contentWidget: dijit._Widget
+		// contentWidget: dijit/_WidgetBase
 		//		Pointer to the real child widget
 		contentWidget: null,
 =====*/
@@ -346,7 +334,8 @@ define([
 			this.inherited(arguments);
 		},
 
-		addChild: function(/*dijit._Widget*/ child, /*Integer?*/ insertIndex){
+		addChild: function(/*dijit/_WidgetBase*/ child, /*Integer?*/ insertIndex){
+			// Overrides _LayoutWidget.addChild().
 			if(this._started){
 				// Adding a child to a started Accordion is complicated because children have
 				// wrapper widgets.  Default code path (calling this.inherited()) would add
@@ -435,7 +424,7 @@ define([
 			this.inherited(arguments);
 		},
 
-		_transition: function(/*dijit._Widget?*/ newWidget, /*dijit._Widget?*/ oldWidget, /*Boolean*/ animate){
+		_transition: function(/*dijit/_WidgetBase?*/ newWidget, /*dijit/_WidgetBase?*/ oldWidget, /*Boolean*/ animate){
 			// Overrides StackContainer._transition() to provide sliding of title bars etc.
 
 			if(has("ie") < 8){
@@ -510,7 +499,7 @@ define([
 		},
 
 		// note: we are treating the container as controller here
-		_onKeyPress: function(/*Event*/ e, /*dijit._Widget*/ fromTitle){
+		_onKeyPress: function(/*Event*/ e, /*dijit/_WidgetBase*/ fromTitle){
 			// summary:
 			//		Handle keypress events
 			// description:

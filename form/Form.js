@@ -10,17 +10,8 @@ define([
 	"../layout/_ContentPaneResizeMixin"
 ], function(declare, domAttr, event, kernel, has, _Widget, _TemplatedMixin, _FormMixin, _ContentPaneResizeMixin){
 
-/*=====
-	var _Widget = dijit._Widget;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _FormMixin = dijit.form._FormMixin;
-	var _ContentPaneResizeMixin = dijit.layout._ContentPaneResizeMixin;
-=====*/
-
 	// module:
 	//		dijit/form/Form
-	// summary:
-	//		Widget corresponding to HTML form tag, for validation and serialization
 
 
 	return declare("dijit.form.Form", [_Widget, _TemplatedMixin, _FormMixin, _ContentPaneResizeMixin], {

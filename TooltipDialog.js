@@ -14,17 +14,8 @@ define([
 ], function(declare, domClass, event, keys, lang,
 			focus, ContentPane, _DialogMixin, _FormMixin, _TemplatedMixin, template, dijit){
 
-/*=====
-	var ContentPane = dijit.layout.ContentPane;
-	var _DialogMixin = dijit._DialogMixin;
-	var _FormMixin = dijit.form._FormMixin;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-=====*/
-
 	// module:
 	//		dijit/TooltipDialog
-	// summary:
-	//		Pops up a dialog that appears like a Tooltip
 
 
 	return declare("dijit.TooltipDialog",

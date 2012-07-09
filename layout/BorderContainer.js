@@ -19,17 +19,8 @@ define([
 ], function(array, cookie, declare, domClass, domConstruct, domGeometry, domStyle, event, keys, lang, on, touch,
 			_WidgetBase, _Widget, _TemplatedMixin, _LayoutWidget, layoutUtils){
 
-/*=====
-	var _WidgetBase = dijit._WidgetBase;
-	var _Widget = dijit._Widget;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _LayoutWidget = dijit.layout._LayoutWidget;
-=====*/
-
 // module:
 //		dijit/layout/BorderContainer
-// summary:
-//		Provides layout in up to 5 regions, a mandatory center with optional borders along its 4 sides.
 
 var _Splitter = declare("dijit.layout._Splitter", [_Widget, _TemplatedMixin ],
 {
@@ -274,9 +265,9 @@ var BorderContainer = declare("dijit.layout.BorderContainer", _LayoutWidget, {
 
 	// design: String
 	//		Which design is used for the layout:
-	//			- "headline" (default) where the top and bottom extend
-	//				the full width of the container
-	//			- "sidebar" where the left and right sides extend from top to bottom.
+	//
+	//		- "headline" (default) where the top and bottom extend the full width of the container
+	//		- "sidebar" where the left and right sides extend from top to bottom.
 	design: "headline",
 
 	// gutters: [const] Boolean
@@ -314,7 +305,7 @@ var BorderContainer = declare("dijit.layout.BorderContainer", _LayoutWidget, {
 		this.inherited(arguments);
 	},
 
-	_setupChild: function(/*dijit._Widget*/ child){
+	_setupChild: function(/*dijit/_WidgetBase*/ child){
 		// Override _LayoutWidget._setupChild().
 
 		var region = child.region;
@@ -359,7 +350,7 @@ var BorderContainer = declare("dijit.layout.BorderContainer", _LayoutWidget, {
 		this._layoutChildren();
 	},
 
-	addChild: function(/*dijit._Widget*/ child, /*Integer?*/ insertIndex){
+	addChild: function(/*dijit/_WidgetBase*/ child, /*Integer?*/ insertIndex){
 		// Override _LayoutWidget.addChild().
 		this.inherited(arguments);
 		if(this._started){
@@ -367,7 +358,7 @@ var BorderContainer = declare("dijit.layout.BorderContainer", _LayoutWidget, {
 		}
 	},
 
-	removeChild: function(/*dijit._Widget*/ child){
+	removeChild: function(/*dijit/_WidgetBase*/ child){
 		// Override _LayoutWidget.removeChild().
 
 		var region = child.region;

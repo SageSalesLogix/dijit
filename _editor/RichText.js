@@ -32,11 +32,6 @@ define([
 	event, kernel, keys, lang, on, query, ready, has, topic, unload, _Url, win,
 	_Widget, _CssStateMixin, selectionapi, rangeapi, htmlapi, focus, dijit){
 
-/*=====
-	var _Widget = dijit._Widget;
-	var _CssStateMixin = dijit._CssStateMixin;
-=====*/
-
 // module:
 //		dijit/_editor/RichText
 // summary:
@@ -66,7 +61,14 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 	// tags:
 	//		private
 
-	constructor: function(params){
+	constructor: function(params /*===== , srcNodeRef =====*/){
+		// summary:
+		//		Create the widget.
+		// params: Object|null
+		//		Initial settings for any of the widget attributes, except readonly attributes.
+		// srcNodeRef: DOMNode
+		//		The widget replaces the specified DOMNode.
+
 		// contentPreFilters: Function(String)[]
 		//		Pre content filter function register array.
 		//		these filters will be executed before the actual
@@ -120,7 +122,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 	focusOnLoad: false,
 
 	// name: String?
-	//		Specifies the name of a (hidden) <textarea> node on the page that's used to save
+	//		Specifies the name of a (hidden) `<textarea>` node on the page that's used to save
 	//		the editor content on page leave.   Used to restore editor contents after navigating
 	//		to a new page and then hitting the back button.
 	name: "",
@@ -149,7 +151,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 
 	// _SEPARATOR: [private] String
 	//		Used to concat contents from multiple editors into a single string,
-	//		so they can be saved into a single <textarea> node.  See "name" attribute.
+	//		so they can be saved into a single `<textarea>` node.  See "name" attribute.
 	_SEPARATOR: "@@**%%__RICHTEXTBOUNDRY__%%**@@",
 
 	// _NAME_CONTENT_SEP: [private] String
@@ -520,7 +522,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 
 	_getIframeDocTxt: function(){
 		// summary:
-		//		Generates the boilerplate text of the document inside the iframe (ie, <html><head>...</head><body/></html>).
+		//		Generates the boilerplate text of the document inside the iframe (ie, `<html><head>...</head><body/></html>`).
 		//		Editor content (if not blank) should be added afterwards.
 		// tags:
 		//		private
@@ -661,7 +663,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 		return text;
 	},
 
-	addStyleSheet: function(/*dojo._Url*/ uri){
+	addStyleSheet: function(/*dojo/_base/url*/ uri){
 		// summary:
 		//		add an external stylesheet for the editing area
 		// uri:
@@ -693,7 +695,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 		}));
 	},
 
-	removeStyleSheet: function(/*dojo._Url*/ uri){
+	removeStyleSheet: function(/*dojo/base/url*/ uri){
 		// summary:
 		//		remove an external stylesheet for the editing area
 		var url=uri.toString();
@@ -921,7 +923,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 		// summary:
 		//		Handler for onkeyup event
 		// tags:
-		//      callback
+		//		callback
 	},
 
 	setDisabled: function(/*Boolean*/ disabled){
@@ -934,7 +936,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 	},
 	_setValueAttr: function(/*String*/ value){
 		// summary:
-		//      Registers that attr("value", foo) should call setValue(foo)
+		//		Registers that attr("value", foo) should call setValue(foo)
 		this.setValue(value);
 	},
 	_setDisableSpellCheckAttr: function(/*Boolean*/ disabled){
@@ -1448,7 +1450,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 		// summary:
 		//		Return the current content of the editing area (post filters
 		//		are applied).  Users should call get('value') instead.
-		//	nonDestructive:
+		// nonDestructive:
 		//		defaults to false. Should the post-filtering be run over a copy
 		//		of the live DOM? Most users should pass "true" here unless they
 		//		*really* know that none of the installed filters are going to
@@ -1597,11 +1599,11 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 		//		the DOM which is passed is run through each of the
 		//		contentPostFilters functions.
 		//
-		//	dom:
+		// dom:
 		//		a node, set of nodes, which to filter using each of the current
 		//		members of the contentDomPostFilters and contentPostFilters arrays.
 		//
-		//	nonDestructive:
+		// nonDestructive:
 		//		defaults to "false". If true, ensures that filtering happens on
 		//		a clone of the passed-in content and not the actual node
 		//		itself.
@@ -1806,7 +1808,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 
 	_preFixUrlAttributes: function(/* String */ html){
 		// summary:
-		//		Pre-filter to do fixing to href attributes on <a> and <img> tags
+		//		Pre-filter to do fixing to href attributes on `<a>` and `<img>` tags
 		// tags:
 		//		private
 		return html.replace(/(?:(<a(?=\s).*?\shref=)("|')(.*?)\2)|(?:(<a\s.*?href=)([^"'][^ >]+))/gi,
@@ -2785,7 +2787,7 @@ var RichText = declare("dijit._editor.RichText", [_Widget, _CssStateMixin], {
 							style = "backgroundColor";
 						}
 						domStyle.set(breaker, style, argument);
-						this._sCall("remove");
+						this._sCall("remove", []);
 						domConstruct.destroy(extraSpan);
 						breaker.innerHTML = "&#160;";	// &nbsp;
 						this._sCall("selectElement", [breaker]);

@@ -8,37 +8,27 @@ define([
 	"dojo/i18n!./nls/validate"
 ], function(declare, kernel, i18n, TextBox, Tooltip, template){
 
-/*=====
-	var Tooltip = dijit.Tooltip;
-	var TextBox = dijit.form.TextBox;
-=====*/
-
 	// module:
 	//		dijit/form/ValidationTextBox
-	// summary:
-	//		Base class for textbox widgets with the ability to validate content of various types and provide user feedback.
 
 
 	/*=====
-		dijit.form.ValidationTextBox.__Constraints = function(){
-			// locale: String
-			//		locale used for validation, picks up value from this widget's lang attribute
-			// _flags_: anything
-			//		various flags passed to pattern function
-			this.locale = "";
-			this._flags_ = "";
-		}
+	var __Constraints = function(){
+		// locale: String
+		//		locale used for validation, picks up value from this widget's lang attribute
+		// _flags_: anything
+		//		various flags passed to pattern function
+		this.locale = "";
+		this._flags_ = "";
+	};
 	=====*/
 
 	var ValidationTextBox;
 	return ValidationTextBox = declare("dijit.form.ValidationTextBox", TextBox, {
 		// summary:
 		//		Base class for textbox widgets with the ability to validate content of various types and provide user feedback.
-		// tags:
-		//		protected
 
 		templateString: template,
-		baseClass: "dijitTextBox dijitValidationTextBox",
 
 		// required: Boolean
 		//		User is required to enter data into this field.
@@ -71,7 +61,7 @@ define([
 		//		displayed when the field is focused.
 		message: "",
 
-		// constraints: dijit.form.ValidationTextBox.__Constraints
+		// constraints: __Constraints
 		//		user-defined object needed to pass parameters to the validator functions
 		constraints: {},
 
@@ -85,7 +75,7 @@ define([
 		// regExp: Deprecated [extension protected] String.  Use "pattern" instead.
 		regExp: "",
 
-		regExpGen: function(/*dijit.form.ValidationTextBox.__Constraints*/ /*===== constraints =====*/){
+		regExpGen: function(/*__Constraints*/ /*===== constraints =====*/){
 			// summary:
 			//		Deprecated.  Use set('pattern', Function) instead.
 		},
@@ -119,7 +109,7 @@ define([
 			this.validate(this.focused);
 		},
 
-		validator: function(/*anything*/ value, /*dijit.form.ValidationTextBox.__Constraints*/ constraints){
+		validator: function(/*anything*/ value, /*__Constraints*/ constraints){
 			// summary:
 			//		Overridable function used to validate the text input against the regular expression.
 			// tags:
@@ -216,24 +206,41 @@ define([
 
 		_refreshState: function(){
 			// Overrides TextBox._refreshState()
-			this.validate(this.focused);
+			if(this._created){
+				this.validate(this.focused);
+			}
 			this.inherited(arguments);
 		},
 
 		//////////// INITIALIZATION METHODS ///////////////////////////////////////
 
-		constructor: function(){
+		constructor: function(params /*===== , srcNodeRef =====*/){
+			// summary:
+			//		Create the widget.
+			// params: Object|null
+			//		Hash of initialization parameters for widget, including scalar values (like title, duration etc.)
+			//		and functions, typically callbacks like onClick.
+			// srcNodeRef: DOMNode|String?
+			//		If a srcNodeRef (DOM node) is specified, replace srcNodeRef with my generated DOM tree.
+
 			this.constraints = {};
+			this.baseClass += ' dijitValidationTextBox';
 		},
 
-		_setConstraintsAttr: function(/*Object*/ constraints){
+		startup: function(){
+			this.inherited(arguments);
+			this._refreshState(); // after all _set* methods have run
+		},
+
+		_setConstraintsAttr: function(/*__Constraints*/ constraints){
 			if(!constraints.locale && this.lang){
 				constraints.locale = this.lang;
 			}
 			this._set("constraints", constraints);
+			this._refreshState();
 		},
 
-		_getPatternAttr: function(/*dijit.form.ValidationTextBox.__Constraints*/ constraints){
+		_getPatternAttr: function(/*__Constraints*/ constraints){
 			// summary:
 			//		Hook to get the current regExp and to compute the partial validation RE.
 			var p = this.pattern;

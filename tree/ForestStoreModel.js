@@ -6,22 +6,15 @@ define([
 	"./TreeStoreModel"
 ], function(array, declare, kernel, lang, TreeStoreModel){
 
-/*=====
-var TreeStoreModel = dijit.tree.TreeStoreModel;
-=====*/
-
 // module:
 //		dijit/tree/ForestStoreModel
-// summary:
-//		Interface between a dijit.Tree and a dojo.data store that doesn't have a root item,
-//		a.k.a. a store that has multiple "top level" items.
 
 return declare("dijit.tree.ForestStoreModel", TreeStoreModel, {
 	// summary:
 	//		Interface between a dijit.Tree and a dojo.data store that doesn't have a root item,
 	//		a.k.a. a store that has multiple "top level" items.
 	//
-	// description
+	// description:
 	//		Use this class to wrap a dojo.data store, making all the items matching the specified query
 	//		appear as children of a fabricated "root item".  If no query is specified then all the
 	//		items returned by fetch() on the underlying store become children of the root item.
@@ -29,11 +22,12 @@ return declare("dijit.tree.ForestStoreModel", TreeStoreModel, {
 	//
 	//		When using this class the developer must override a number of methods according to their app and
 	//		data, including:
-	//			- onNewRootItem
-	//			- onAddToRoot
-	//			- onLeaveRoot
-	//			- onNewItem
-	//			- onSetItem
+	//
+	//		- onNewRootItem
+	//		- onAddToRoot
+	//		- onLeaveRoot
+	//		- onNewItem
+	//		- onSetItem
 
 	// Parameters to constructor
 
@@ -72,7 +66,7 @@ return declare("dijit.tree.ForestStoreModel", TreeStoreModel, {
 	// =======================================================================
 	// Methods for traversing hierarchy
 
-	mayHaveChildren: function(/*dojo.data.Item*/ item){
+	mayHaveChildren: function(/*dojo/data/Item*/ item){
 		// summary:
 		//		Tells if an item has or may have children.  Implementing logic here
 		//		avoids showing +/- expando icon for nodes that we know don't have children.
@@ -83,7 +77,7 @@ return declare("dijit.tree.ForestStoreModel", TreeStoreModel, {
 		return item === this.root || this.inherited(arguments);
 	},
 
-	getChildren: function(/*dojo.data.Item*/ parentItem, /*function(items)*/ callback, /*function*/ onError){
+	getChildren: function(/*dojo/data/Item*/ parentItem, /*function(items)*/ callback, /*function*/ onError){
 		// summary:
 		//		Calls onComplete() with array of child items of given parent item, all loaded.
 		if(parentItem === this.root){
@@ -134,7 +128,7 @@ return declare("dijit.tree.ForestStoreModel", TreeStoreModel, {
 	// =======================================================================
 	// Write interface
 
-	newItem: function(/* dojo.dnd.Item */ args, /*Item*/ parent, /*int?*/ insertIndex){
+	newItem: function(/* dijit/tree/dndSource.__Item */ args, /*Item*/ parent, /*int?*/ insertIndex){
 		// summary:
 		//		Creates a new item.   See dojo.data.api.Write for details on args.
 		//		Used in drag & drop when item from external source dropped onto tree.
@@ -146,7 +140,7 @@ return declare("dijit.tree.ForestStoreModel", TreeStoreModel, {
 		}
 	},
 
-	onNewRootItem: function(/* dojo.dnd.Item */ /*===== args =====*/){
+	onNewRootItem: function(/* dijit/tree/dndSource.__Item */ /*===== args =====*/){
 		// summary:
 		//		User can override this method to modify a new element that's being
 		//		added to the root of the tree, for example to add a flag like root=true
@@ -224,7 +218,7 @@ return declare("dijit.tree.ForestStoreModel", TreeStoreModel, {
 		});
 	},
 
-	onNewItem: function(/* dojo.data.Item */ item, /* Object */ parentInfo){
+	onNewItem: function(/* dojo/data/api/Item */ item, /* Object */ parentInfo){
 		// summary:
 		//		Handler for when new items appear in the store.  Developers should override this
 		//		method to be more efficient based on their app/data.

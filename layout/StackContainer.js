@@ -14,16 +14,8 @@ define([
 ], function(array, cookie, declare, domClass, has, lang, ready, topic,
 			registry, _WidgetBase, _LayoutWidget){
 
-/*=====
-var _WidgetBase = dijit._WidgetBase;
-var _LayoutWidget = dijit.layout._LayoutWidget;
-var StackController = dijit.layout.StackController;
-=====*/
-
 // module:
 //		dijit/layout/StackContainer
-// summary:
-//		A container that has multiple children, but shows only one child at a time.
 
 // Back compat w/1.6, remove for 2.0
 if(has("dijit-legacy-requires")){
@@ -38,23 +30,29 @@ if(has("dijit-legacy-requires")){
 // into the base widget class.  (This is a hack, but it's effective.)
 lang.extend(_WidgetBase, {
 	// selected: Boolean
-	//		Parameter for children of `dijit.layout.StackContainer` or subclasses.
+	//		Attribute of children of `dijit.layout.StackContainer` and subclasses.
 	//		Specifies that this widget should be the initially displayed pane.
 	//		Note: to change the selected child use `dijit.layout.StackContainer.selectChild`
 	selected: false,
 
+	// disabled: Boolean
+	//		Attribute of children of `dijit.layout.StackContainer` and subclasses.
+	//		Specifies that the button to select this pane should be disabled.
+	//		Doesn't affect programmatic selection of the pane, nor does it deselect the pane if it is currently selected.
+	disabled: false,
+
 	// closable: Boolean
-	//		Parameter for children of `dijit.layout.StackContainer` or subclasses.
+	//		Attribute of children of `dijit.layout.StackContainer` and subclasses.
 	//		True if user can close (destroy) this child, such as (for example) clicking the X on the tab.
 	closable: false,
 
 	// iconClass: String
-	//		Parameter for children of `dijit.layout.StackContainer` or subclasses.
+	//		Attribute of children of `dijit.layout.StackContainer` and subclasses.
 	//		CSS Class specifying icon to use in label associated with this pane.
 	iconClass: "dijitNoIcon",
 
 	// showTitle: Boolean
-	//		Parameter for children of `dijit.layout.StackContainer` or subclasses.
+	//		Attribute of children of `dijit.layout.StackContainer` and subclasses.
 	//		When true, display title of this widget as tab label etc., rather than just using
 	//		icon specified in iconClass
 	showTitle: true
@@ -137,6 +135,7 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 	},
 
 	resize: function(){
+		// Overrides _LayoutWidget.resize()
 		// Resize is called when we are first made visible (it's called from startup()
 		// if we are initially visible). If this is the first time we've been made
 		// visible then show our first child.
@@ -150,7 +149,7 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 		this.inherited(arguments);
 	},
 
-	_setupChild: function(/*dijit._Widget*/ child){
+	_setupChild: function(/*dijit/_WidgetBase*/ child){
 		// Overrides _LayoutWidget._setupChild()
 
 		this.inherited(arguments);
@@ -162,7 +161,7 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 		child.domNode.title = "";
 	},
 
-	addChild: function(/*dijit._Widget*/ child, /*Integer?*/ insertIndex){
+	addChild: function(/*dijit/_WidgetBase*/ child, /*Integer?*/ insertIndex){
 		// Overrides _Container.addChild() to do layout and publish events
 
 		this.inherited(arguments);
@@ -186,7 +185,7 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 		}
 	},
 
-	removeChild: function(/*dijit._Widget*/ page){
+	removeChild: function(/*dijit/_WidgetBase*/ page){
 		// Overrides _Container.removeChild() to do layout and publish events
 
 		this.inherited(arguments);
@@ -197,7 +196,7 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 		}
 
 		// If all our children are being destroyed than don't run the code below (to select another page),
-		//  because we are deleting every page one by one
+		// because we are deleting every page one by one
 		if(this._descendantsBeingDestroyed){ return; }
 
 		// Select new page to display, also updating TabController to show the respective tab.
@@ -220,7 +219,7 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 		}
 	},
 
-	selectChild: function(/*dijit._Widget|String*/ page, /*Boolean*/ animate){
+	selectChild: function(/*dijit/_WidgetBase|String*/ page, /*Boolean*/ animate){
 		// summary:
 		//		Show the given widget (which must be one of my children)
 		// page:
@@ -246,9 +245,9 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 		// summary:
 		//		Hide the old widget and display the new widget.
 		//		Subclasses should override this.
-		// newWidget: dijit._Widget
+		// newWidget: dijit/_WidgetBase
 		//		The newly selected widget.
-		// oldWidget: dijit._Widget
+		// oldWidget: dijit/_WidgetBase
 		//		The previously selected widget.
 		// animate: Boolean
 		//		Used by AccordionContainer to turn on/off slide effect.
@@ -278,10 +277,13 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 	_adjacent: function(/*Boolean*/ forward){
 		// summary:
 		//		Gets the next/previous child widget in this container from the current selection.
+
+		// TODO: remove for 2.0 if this isn't being used.   Otherwise, fix to skip disabled tabs.
+
 		var children = this.getChildren();
 		var index = array.indexOf(children, this.selectedChildWidget);
 		index += forward ? 1 : children.length - 1;
-		return children[ index % children.length ]; // dijit._Widget
+		return children[ index % children.length ]; // dijit/_WidgetBase
 	},
 
 	forward: function(){
@@ -312,7 +314,7 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 		}
 	},
 
-	_showChild: function(/*dijit._Widget*/ page){
+	_showChild: function(/*dijit/_WidgetBase*/ page){
 		// summary:
 		//		Show the specified child by changing it's CSS, and call _onShow()/onShow() so
 		//		it can do any updates it needs regarding loading href's etc.
@@ -328,7 +330,7 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 		return (page._onShow && page._onShow()) || true;
 	},
 
-	_hideChild: function(/*dijit._Widget*/ page){
+	_hideChild: function(/*dijit/_WidgetBase*/ page){
 		// summary:
 		//		Hide the specified child by changing it's CSS, and call _onHide() so
 		//		it's notified.
@@ -338,7 +340,7 @@ return declare("dijit.layout.StackContainer", _LayoutWidget, {
 		page.onHide && page.onHide();
 	},
 
-	closeChild: function(/*dijit._Widget*/ page){
+	closeChild: function(/*dijit/_WidgetBase*/ page){
 		// summary:
 		//		Callback when user clicks the [X] to remove a page.
 		//		If onClose() returns true then remove and destroy the child.

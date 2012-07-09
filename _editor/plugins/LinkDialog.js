@@ -14,9 +14,6 @@ define([
 ], function(require, declare, domAttr, keys, lang, has, query, string,
 	_Widget, _Plugin, DropDownButton, rangeapi){
 
-/*=====
-	var _Plugin = dijit._editor._Plugin;
-=====*/
 
 // module:
 //		dijit/_editor/plugins/LinkDialog
@@ -28,10 +25,10 @@ var LinkDialog = declare("dijit._editor.plugins.LinkDialog", _Plugin, {
 	// summary:
 	//		This plugin provides the basis for an 'anchor' (link) dialog and an extension of it
 	//		provides the image link dialog.
-	//
 	// description:
 	//		The command provided by this plugin is:
-	//		* createLink
+	//
+	//		- createLink
 
 	// Override _Plugin.buttonClass.   This plugin is controlled by a DropDownButton
 	// (which triggers a TooltipDialog).
@@ -71,7 +68,7 @@ var LinkDialog = declare("dijit._editor.plugins.LinkDialog", _Plugin, {
 	// linkDialogTemplate: [protected] String
 	//		Template for contents of TooltipDialog to pick URL
 	linkDialogTemplate: [
-		"<table><tr><td>",
+		"<table role='presentation'><tr><td>",
 		"<label for='${id}_urlInput'>${url}</label>",
 		"</td><td>",
 		"<input data-dojo-type='dijit.form.ValidationTextBox' required='true' " +
@@ -122,6 +119,7 @@ var LinkDialog = declare("dijit._editor.plugins.LinkDialog", _Plugin, {
 				i18n.getLocalization("dijit._editor", "LinkDialog", this.lang));
 			var dropDown = (this.dropDown = this.button.dropDown = new TooltipDialog({
 				title: messages[this.command + "Title"],
+				ownerDocument: this.editor.ownerDocument,
 				dir: this.editor.dir,
 				execute: lang.hitch(this, "setValue"),
 				onOpen: function(){
@@ -268,7 +266,8 @@ var LinkDialog = declare("dijit._editor.plugins.LinkDialog", _Plugin, {
 		//		Callback from the dialog when user presses "set" button.
 		// tags:
 		//		private
-		//TODO: prevent closing popup if the text is empty
+		
+		// TODO: prevent closing popup if the text is empty
 		this._onCloseDialog();
 		if(has("ie") < 9){ //see #4151
 			var sel = rangeapi.getSelection(this.editor.window);
@@ -440,15 +439,15 @@ var ImgLinkDialog = declare("dijit._editor.plugins.ImgLinkDialog", [LinkDialog],
 	// summary:
 	//		This plugin extends LinkDialog and adds in a plugin for handling image links.
 	//		provides the image link dialog.
-	//
 	// description:
 	//		The command provided by this plugin is:
-	//		* insertImage
+	//
+	//		- insertImage
 
 	// linkDialogTemplate: [protected] String
 	//		Over-ride for template since img dialog doesn't need target that anchor tags may.
 	linkDialogTemplate: [
-		"<table><tr><td>",
+		"<table role='presentation'><tr><td>",
 		"<label for='${id}_urlInput'>${url}</label>",
 		"</td><td>",
 		"<input dojoType='dijit.form.ValidationTextBox' regExp='${urlRegExp}' " +
@@ -467,7 +466,7 @@ var ImgLinkDialog = declare("dijit._editor.plugins.ImgLinkDialog", [LinkDialog],
 	].join(""),
 
 	// htmlTemplate: [protected] String
-	//		String used for templating the <img> HTML to insert at the desired point.
+	//		String used for templating the `<img>` HTML to insert at the desired point.
 	htmlTemplate: "<img src=\"${urlInput}\" _djrealurl=\"${urlInput}\" alt=\"${textInput}\" />",
 
 	// tag: [protected] String
@@ -487,7 +486,7 @@ var ImgLinkDialog = declare("dijit._editor.plugins.ImgLinkDialog", [LinkDialog],
 			text = img.getAttribute('alt');
 			this.editor._sCall("selectElement", [img, true]);
 		}else{
-			text = this.editor._sCall("getSelectedText");
+			text = this.editor._sCall("getSelectedText", []);
 		}
 		return {urlInput: url || '', textInput: text || ''}; //Object
 	},
@@ -601,6 +600,8 @@ _Plugin.registry["insertImage"] = function(){
 
 
 // Export both LinkDialog and ImgLinkDialog
+// TODO for 2.0: either return both classes in a hash, or split this file into two separate files.
+// Then the documentation for the module can be applied to the hash, and will show up in the API doc.
 LinkDialog.ImgLinkDialog = ImgLinkDialog;
 return LinkDialog;
 });

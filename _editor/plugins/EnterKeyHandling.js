@@ -10,22 +10,11 @@ define([
 	"../_Plugin",
 	"../RichText",
 	"../range",
-	"../selection",
 	"../../_base/focus"
-], function(declare, domConstruct, event, keys, lang, has, win, winUtils, _Plugin, RichText, rangeapi, selectionapi,
-			baseFocus){
-/*=====
-	var _Plugin = dijit._editor._Plugin;
-=====*/
+], function(declare, domConstruct, event, keys, lang, has, win, winUtils, _Plugin, RichText, rangeapi, baseFocus){
 
 // module:
 //		dijit/_editor/plugins/EnterKeyHandling
-// summary:
-//		This plugin tries to make all browsers behave consistently with regard to
-//		how ENTER behaves in the editor window.  It traps the ENTER key and alters
-//		the way DOM is constructed in certain cases to try to commonize the generated
-//		DOM and behaviors across browsers.
-
 
 return declare("dijit._editor.plugins.EnterKeyHandling", _Plugin, {
 	// summary:
@@ -37,60 +26,60 @@ return declare("dijit._editor.plugins.EnterKeyHandling", _Plugin, {
 	// description:
 	//		This plugin has three modes:
 	//
-	//			* blockNodeForEnter=BR
-	//			* blockNodeForEnter=DIV
-	//			* blockNodeForEnter=P
+	//		- blockNodeForEnter=BR
+	//		- blockNodeForEnter=DIV
+	//		- blockNodeForEnter=P
 	//
 	//		In blockNodeForEnter=P, the ENTER key starts a new
 	//		paragraph, and shift-ENTER starts a new line in the current paragraph.
 	//		For example, the input:
 	//
-	//		|	first paragraph <shift-ENTER>
-	//		|	second line of first paragraph <ENTER>
-	//		|	second paragraph
+	//	|	first paragraph <shift-ENTER>
+	//	|	second line of first paragraph <ENTER>
+	//	|	second paragraph
 	//
 	//		will generate:
 	//
-	//		|	<p>
-	//		|		first paragraph
-	//		|		<br/>
-	//		|		second line of first paragraph
-	//		|	</p>
-	//		|	<p>
-	//		|		second paragraph
-	//		|	</p>
+	//	|	<p>
+	//	|		first paragraph
+	//	|		<br/>
+	//	|		second line of first paragraph
+	//	|	</p>
+	//	|	<p>
+	//	|		second paragraph
+	//	|	</p>
 	//
 	//		In BR and DIV mode, the ENTER key conceptually goes to a new line in the
 	//		current paragraph, and users conceptually create a new paragraph by pressing ENTER twice.
 	//		For example, if the user enters text into an editor like this:
 	//
-	//		|		one <ENTER>
-	//		|		two <ENTER>
-	//		|		three <ENTER>
-	//		|		<ENTER>
-	//		|		four <ENTER>
-	//		|		five <ENTER>
-	//		|		six <ENTER>
+	//	|		one <ENTER>
+	//	|		two <ENTER>
+	//	|		three <ENTER>
+	//	|		<ENTER>
+	//	|		four <ENTER>
+	//	|		five <ENTER>
+	//	|		six <ENTER>
 	//
 	//		It will appear on the screen as two 'paragraphs' of three lines each.  Markupwise, this generates:
 	//
 	//		BR:
-	//		|		one<br/>
-	//		|		two<br/>
-	//		|		three<br/>
-	//		|		<br/>
-	//		|		four<br/>
-	//		|		five<br/>
-	//		|		six<br/>
+	//	|		one<br/>
+	//	|		two<br/>
+	//	|		three<br/>
+	//	|		<br/>
+	//	|		four<br/>
+	//	|		five<br/>
+	//	|		six<br/>
 	//
 	//		DIV:
-	//		|		<div>one</div>
-	//		|		<div>two</div>
-	//		|		<div>three</div>
-	//		|		<div>&nbsp;</div>
-	//		|		<div>four</div>
-	//		|		<div>five</div>
-	//		|		<div>six</div>
+	//	|		<div>one</div>
+	//	|		<div>two</div>
+	//	|		<div>three</div>
+	//	|		<div>&nbsp;</div>
+	//	|		<div>four</div>
+	//	|		<div>five</div>
+	//	|		<div>six</div>
 
 	// blockNodeForEnter: String
 	//		This property decides the behavior of Enter key. It can be either P,
@@ -166,7 +155,7 @@ return declare("dijit._editor.plugins.EnterKeyHandling", _Plugin, {
 					// circulate the undo detection code by calling RichText::execCommand directly
 					RichText.prototype.execCommand.call(this.editor, 'formatblock',this.blockNodeForEnter);
 					// set the innerHTML of the new block node
-					var block = this.editor._sCall('getAncestorElement', this.blockNodeForEnter);
+					var block = this.editor._sCall('getAncestorElement', [this.blockNodeForEnter]);
 					if(block){
 						block.innerHTML=this.bogusHtmlContent;
 						if(has("ie")){
@@ -225,7 +214,7 @@ return declare("dijit._editor.plugins.EnterKeyHandling", _Plugin, {
 
 		var selection, range, newrange, startNode, endNode, brNode, doc=this.editor.document,br,rs,txt;
 		if(e.shiftKey){		// shift+enter always generates <br>
-			var parent = this.editor._sCall('getParentElement');
+			var parent = this.editor._sCall('getParentElement', []);
 			var header = rangeapi.getAncestor(parent,this.blockNodes);
 			if(header){
 				if(header.tagName == 'LI'){
@@ -324,9 +313,9 @@ return declare("dijit._editor.plugins.EnterKeyHandling", _Plugin, {
 							selection.removeAllRanges();
 							selection.addRange(newrange);
 							if(endEmpty && !has("webkit")){
-								selectionapi.remove();
+								this.editor._sCall("remove", []);
 							}else{
-								selectionapi.collapse(true);
+								this.editor._sCall("collapse", [true]);
 							}
 						}else{
 							var targetNode;
@@ -347,7 +336,7 @@ return declare("dijit._editor.plugins.EnterKeyHandling", _Plugin, {
 							newrange.setEnd(endNode, endNode.length);
 							selection.removeAllRanges();
 							selection.addRange(newrange);
-							selectionapi.collapse(true);
+							this.editor._sCall("collapse", [true]);
 						}
 					}
 				}else{
@@ -399,7 +388,7 @@ return declare("dijit._editor.plugins.EnterKeyHandling", _Plugin, {
 			}catch(e2){ /*squelch FF3 exception bug when editor content is a single BR*/ }
 			// get the newly created block node
 			// FIXME
-			block = {blockNode: this.editor._sCall('getAncestorElement', this.blockNodeForEnter),
+			block = {blockNode: this.editor._sCall('getAncestorElement', [this.blockNodeForEnter]),
 					blockContainer: this.editor.editNode};
 			if(block.blockNode){
 				if(block.blockNode != this.editor.editNode &&
@@ -592,14 +581,14 @@ return declare("dijit._editor.plugins.EnterKeyHandling", _Plugin, {
 
 	_adjustNodeAndOffset: function(/*DomNode*/node, /*Int*/offset){
 		// summary:
-		//              In the case there are multiple text nodes in a row the offset may not be within the node.  If the offset is larger than the node length, it will attempt to find
-		//              the next text sibling until it locates the text node in which the offset refers to
+		//		In the case there are multiple text nodes in a row the offset may not be within the node.  If the offset is larger than the node length, it will attempt to find
+		//		the next text sibling until it locates the text node in which the offset refers to
 		// node:
-		//              The node to check.
+		//		The node to check.
 		// offset:
-		//              The position to find within the text node
+		//		The position to find within the text node
 		// tags:
-		//              private.
+		//		private.
 		while(node.length < offset && node.nextSibling && node.nextSibling.nodeType==3){
 			//Adjust the offset and node in the case of multiple text nodes in a row
 			offset = offset - node.length;
@@ -610,11 +599,11 @@ return declare("dijit._editor.plugins.EnterKeyHandling", _Plugin, {
 
 	removeTrailingBr: function(container){
 		// summary:
-		//		If last child of container is a <br>, then remove it.
+		//		If last child of container is a `<br>`, then remove it.
 		// tags:
 		//		private
 		var para = /P|DIV|LI/i.test(container.tagName) ?
-			container : selectionapi.getParentOfType(container,['P','DIV','LI']);
+			container : this.editor._sCall("getParentOfType", [container,['P','DIV','LI']]);
 
 		if(!para){ return; }
 		if(para.lastChild){

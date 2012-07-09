@@ -17,17 +17,8 @@ define([
 ], function(array, declare, dom, domAttr, domClass, domGeometry, event, fxUtils, kernel, keys,
 			_CssStateMixin, _TemplatedMixin, ContentPane, template, manager){
 
-/*=====
-	var _Widget = dijit._Widget;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _CssStateMixin = dijit._CssStateMixin;
-	var ContentPane = dijit.layout.ContentPane;
-=====*/
-
 // module:
 //		dijit/TitlePane
-// summary:
-//		A pane with a title on top, that can be expanded or collapsed.
 
 
 return declare("dijit.TitlePane", [ContentPane, _TemplatedMixin, _CssStateMixin], {

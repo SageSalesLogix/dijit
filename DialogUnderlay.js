@@ -7,15 +7,8 @@ define([
 	"./BackgroundIframe"
 ], function(declare, domAttr, winUtils, _Widget, _TemplatedMixin, BackgroundIframe){
 
-/*=====
-	var _Widget = dijit._Widget;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-=====*/
-
 	// module:
 	//		dijit/DialogUnderlay
-	// summary:
-	//		The component that blocks the screen behind a `dijit.Dialog`
 
 	return declare("dijit.DialogUnderlay", [_Widget, _TemplatedMixin], {
 		// summary:

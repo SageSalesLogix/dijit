@@ -34,8 +34,6 @@ define([
 
 	// module:
 	//		dijit/Editor
-	// summary:
-	//		A rich text Editing widget
 
 	var Editor = declare("dijit.Editor", RichText, {
 		// summary:
@@ -62,11 +60,13 @@ define([
 		//		A list of extra plugin names which will be appended to plugins array
 		extraPlugins: null,
 
-		constructor: function(){
+		constructor: function(/*===== params, srcNodeRef =====*/){
 			// summary:
-			//		Runs on widget initialization to setup arrays etc.
-			// tags:
-			//		private
+			//		Create the widget.
+			// params: Object|null
+			//		Initial settings for any of the attributes, except readonly attributes.
+			// srcNodeRef: DOMNode
+			//		The editor replaces the specified DOMNode.
 
 			if(!lang.isArray(this.plugins)){
 				this.plugins=["undo","redo","|","cut","copy","paste","|","bold","italic","underline","strikethrough","|",
@@ -121,6 +121,7 @@ define([
 			if(!this.toolbar){
 				// if we haven't been assigned a toolbar, create one
 				this.toolbar = new Toolbar({
+					ownerDocument: this.ownerDocument,
 					dir: this.dir,
 					lang: this.lang
 				});
@@ -164,13 +165,11 @@ define([
 			//		plugins array. If index is passed, it's placed in the plugins
 			//		array at that index. No big magic, but a nice helper for
 			//		passing in plugin names via markup.
-			//
-			// plugin: String, args object, plugin instance, or plugin constructor
-			//
+			// plugin:
+			//		String, args object, plugin instance, or plugin constructor
 			// args:
 			//		This object will be passed to the plugin constructor
-			//
-			// index: Integer
+			// index:
 			//		Used when creating an instance from
 			//		something already in this.plugins. Ensures that the new
 			//		instance is assigned to this.plugins at that index.
@@ -358,7 +357,7 @@ define([
 		execCommand: function(cmd){
 			// summary:
 			//		Main handler for executing any commands to the editor, like paste, bold, etc.
-			//      Called by plugins, but not meant to be called by end users.
+			//		Called by plugins, but not meant to be called by end users.
 			// tags:
 			//		protected
 			if(this.customUndo && (cmd == 'undo' || cmd == 'redo')){
@@ -430,7 +429,7 @@ define([
 		queryCommandEnabled: function(cmd){
 			// summary:
 			//		Returns true if specified editor command is enabled.
-			//      Used by the plugins to know when to highlight/not highlight buttons.
+			//		Used by the plugins to know when to highlight/not highlight buttons.
 			// tags:
 			//		protected
 			if(this.customUndo && (cmd == 'undo' || cmd == 'redo')){
@@ -456,7 +455,7 @@ define([
 						array.forEach(mark,function(n){
 							bookmark.push(rangeapi.getNode(n,this.editNode));
 						},this);
-						win.withGlobal(this.window,'moveToBookmark',dijit,[{mark: bookmark, isCollapsed: col}]);
+						win.withGlobal(this.window,'moveToBookmark',focusBase,[{mark: bookmark, isCollapsed: col}]);
 					}else{
 						if(mark.startContainer && mark.endContainer){
 							// Use the pseudo WC3 range API.  This works better for positions
@@ -513,7 +512,6 @@ define([
 			//		Handler for editor undo (ex: ctrl-z) operation
 			// tags:
 			//		private
-			//console.log('undo');
 			var ret = false;
 			if(!this._undoRedoActive){
 				this._undoRedoActive = true;
@@ -536,7 +534,6 @@ define([
 			//		Handler for editor redo (ex: ctrl-y) operation
 			// tags:
 			//		private
-			//console.log('redo');
 			var ret = false;
 			if(!this._undoRedoActive){
 				this._undoRedoActive = true;
@@ -634,6 +631,7 @@ define([
 			//		Deals with saving undo; see editActionInterval parameter.
 			// tags:
 			//		private
+			
 			// Avoid filtering to make sure selections restore.
 			var v = html.getChildrenHtml(this.editNode);
 
@@ -746,7 +744,7 @@ define([
 				// only restore the selection if the current range is collapsed
 				// if not collapsed, then it means the editor does not lose
 				// selection and there is no need to restore it
-				if(win.withGlobal(this.window,'isCollapsed',dijit)){
+				if(win.withGlobal(this.window,'isCollapsed',focusBase)){
 					this._moveToBookmark(this._savedSelection);
 				}
 				delete this._savedSelection;
@@ -849,7 +847,12 @@ define([
 		"superscript": togglePluginFactory,
 
 		"|": function(){
-			return new _Plugin({ button: new ToolbarSeparator(), setEditor: function(editor){this.editor = editor;}});
+			return new _Plugin({
+				setEditor: function(editor){
+					this.editor = editor;
+					this.button = new ToolbarSeparator({ownerDocument: editor.ownerDocument});
+				}
+			});
 		}
 	});
 

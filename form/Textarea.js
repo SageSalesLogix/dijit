@@ -5,15 +5,8 @@ define([
 	"./SimpleTextarea"
 ], function(declare, domStyle, _ExpandingTextAreaMixin, SimpleTextarea){
 
-/*=====
-	var _ExpandingTextAreaMixin = dijit.form._ExpandingTextAreaMixin;
-	var SimpleTextarea = dijit.form.SimpleTextarea;
-=====*/
-
 // module:
 //		dijit/form/Textarea
-// summary:
-//		A textarea widget that adjusts it's height according to the amount of data.
 
 
 return declare("dijit.form.Textarea", [SimpleTextarea, _ExpandingTextAreaMixin], {

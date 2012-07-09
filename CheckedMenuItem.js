@@ -6,14 +6,8 @@ define([
 	"./hccss"
 ], function(declare, domClass, MenuItem, template){
 
-/*=====
-	var MenuItem = dijit.MenuItem;
-=====*/
-
 	// module:
 	//		dijit/CheckedMenuItem
-	// summary:
-	//		A checkbox-like menu item for toggling on and off
 
 	return declare("dijit.CheckedMenuItem", MenuItem, {
 		// summary:

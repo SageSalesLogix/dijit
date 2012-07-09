@@ -3,16 +3,37 @@ define([
 	"dojo/_base/declare", // declare
 	"dojo/dom-class", // domClass.add domClass.remove domClass.replace
 	"dojo/_base/event",	// event.stop
-	"dojo/_base/lang", // lang.getObject lang.mixin lang.hitch
+	"dojo/_base/lang", // lang.mixin lang.hitch
 	"dojo/on",
 	"dojo/touch"
 ], function(aspect, declare,domClass, event, lang, on, touch){
 
 	// module:
 	//		dijit/tree/_dndContainer
-	// summary:
-	//		This is a base class for `dijit.tree._dndSelector`, and isn't meant to be used directly.
-	//		It's modeled after `dojo.dnd.Container`.
+
+	/*=====
+	 var __Args = function(){
+		 // summary:
+		 //		A dict of parameters for Tree source configuration.
+		 // isSource: Boolean?
+		 //		Can be used as a DnD source. Defaults to true.
+		 // accept: String[]
+		 //		List of accepted types (text strings) for a target; defaults to
+		 //		["text", "treeNode"]
+		 // copyOnly: Boolean?
+		 //		Copy items, if true, use a state of Ctrl key otherwise,
+		 // dragThreshold: Number
+		 //		The move delay in pixels before detecting a drag; 0 by default
+		 // betweenThreshold: Integer
+		 //		Distance from upper/lower edge of node to allow drop to reorder nodes
+		 this.isSource = isSource;
+		 this.accept = accept;
+		 this.autoSync = autoSync;
+		 this.copyOnly = copyOnly;
+		 this.dragThreshold = dragThreshold;
+		 this.betweenThreshold = betweenThreshold;
+	 };
+	 =====*/
 
 	return declare("dijit.tree._dndContainer", null, {
 
@@ -34,7 +55,7 @@ define([
 			//		A constructor of the Container
 			// tree: Node
 			//		Node or node's id to build the container on
-			// params: dijit.tree.__SourceArgs
+			// params: __Args
 			//		A dict of parameters, which gets mixed into the object
 			// tags:
 			//		private
@@ -50,7 +71,6 @@ define([
 			domClass.add(this.node, "dojoDndContainer");
 
 			// set up events
-			var self = this;
 			this.events = [
 				// Mouse (or touch) enter/leave on Tree itself
 				on(this.node, touch.enter, lang.hitch(this, "onOverEvent")),

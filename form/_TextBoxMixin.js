@@ -11,8 +11,6 @@ define([
 
 // module:
 //		dijit/form/_TextBoxMixin
-// summary:
-//		A mixin for textbox form input widgets
 
 var _TextBoxMixin = declare("dijit.form._TextBoxMixin", null, {
 	// summary:
@@ -51,9 +49,9 @@ var _TextBoxMixin = declare("dijit.form._TextBoxMixin", null, {
 		// summary:
 		//		Hook so get('value') works as we like.
 		// description:
-		//		For `dijit.form.TextBox` this basically returns the value of the <input>.
+		//		For `dijit/form/TextBox` this basically returns the value of the `<input>`.
 		//
-		//		For `dijit.form.MappedTextBox` subclasses, which have both
+		//		For `dijit/form/MappedTextBox` subclasses, which have both
 		//		a "displayed value" and a separate "submit value",
 		//		This treats the "displayed value" as the master value, computing the
 		//		submit value from it via this.parse().
@@ -207,6 +205,7 @@ var _TextBoxMixin = declare("dijit.form._TextBoxMixin", null, {
 	_onInput: function(){
 		// summary:
 		//		Called AFTER the input event has happened
+
 		// set text direction according to textDir that was defined in creation
 		if(this.textDir == "auto"){
 			this.applyTextDir(this.focusNode, this.focusNode.value);
@@ -227,7 +226,7 @@ var _TextBoxMixin = declare("dijit.form._TextBoxMixin", null, {
 
 		// normalize input events to reduce spurious event processing
 		//	onkeydown: do not forward modifier keys
-		//	           set charOrCode to numeric keycode
+		//		       set charOrCode to numeric keycode
 		//	onkeypress: do not forward numeric charOrCode keys (already sent through onkeydown)
 		//	onpaste & oncut: set charOrCode to 229 (IME)
 		//	oninput: if primary event not already processed, set charOrCode to 229 (IME), else do not forward
@@ -325,7 +324,7 @@ var _TextBoxMixin = declare("dijit.form._TextBoxMixin", null, {
 			if(faux._wasConsumed){ return; } // if preventDefault was called
 			this.defer(function(){ this._onInput(faux); }); // widget notification after key has posted
 		};
-		this._adoptHandles(on(this.textbox, "keydown, keypress, paste, cut, input, compositionend", lang.hitch(this, handleEvent)));
+		this.own(on(this.textbox, "keydown, keypress, paste, cut, input, compositionend", lang.hitch(this, handleEvent)));
 	},
 
 	_blankValue: '', // if the textbox is blank, what value should be reported
@@ -335,8 +334,10 @@ var _TextBoxMixin = declare("dijit.form._TextBoxMixin", null, {
 		//		value on blur or form submit.
 		// description:
 		//		For MappedTextBox subclasses, this is called twice
-		//			- once with the display value
-		//			- once the value as set/returned by set('value', ...)
+		//
+		//		- once with the display value
+		//		- once the value as set/returned by set('value', ...)
+		//
 		//		and get('value'), ex: a Number for NumberTextBox.
 		//
 		//		In the latter case it does corrections like converting null to NaN.  In

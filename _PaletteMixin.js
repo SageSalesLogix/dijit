@@ -11,14 +11,8 @@ define([
 	"./typematic"
 ], function(declare, domAttr, domClass, domConstruct, event, keys, lang, _CssStateMixin, focus, typematic){
 
-/*=====
-	var _CssStateMixin = dijit._CssStateMixin;
-=====*/
-
 // module:
 //		dijit/_PaletteMixin
-// summary:
-//		A keyboard accessible palette, for picking a color/emoticon/etc.
 
 return declare("dijit._PaletteMixin", [_CssStateMixin], {
 	// summary:
@@ -33,7 +27,7 @@ return declare("dijit._PaletteMixin", [_CssStateMixin], {
 	// timeoutChangeRate: Number
 	//		Fraction of time used to change the typematic timer between events
 	//		1.0 means that each typematic event fires at defaultTimeout intervals
-	//		< 1.0 means that each typematic event fires at an increasing faster rate
+	//		Less than 1.0 means that each typematic event fires at an increasing faster rate
 	timeoutChangeRate: 0.90,
 
 	// value: String
@@ -72,22 +66,24 @@ return declare("dijit._PaletteMixin", [_CssStateMixin], {
 	//		CSS class applied to each cell in the palette
 	cellClass: "dijitPaletteCell",
 
-	// dyeClass: [protected] String
-	//	 Name of javascript class for Object created for each cell of the palette.
-	//	 dyeClass should implements dijit.Dye interface
-	dyeClass: '',
+	// dyeClass: [protected] Constructor
+	//		Constructor for Object created for each cell of the palette.
+	//		dyeClass should implements dijit.Dye interface
+	dyeClass: null,
 	
 	// summary: String
 	//		Localized summary for the palette table
 	summary: '',
 	_setSummaryAttr: "paletteTableNode",
 
-	_dyeFactory: function(value /*===== , row, col =====*/){
+	_dyeFactory: function(value /*===== , row, col, title =====*/){
 		// summary:
 		//		Return instance of dijit.Dye for specified cell of palette
 		// tags:
 		//		extension
-		var dyeClassObj = lang.getObject(this.dyeClass);
+
+		// Remove string support for 2.0
+		var dyeClassObj = typeof this.dyeClass == "string" ? lang.getObject(this.dyeClass) : this.dyeClass;
 		return new dyeClassObj(value);
 	},
 
@@ -110,7 +106,7 @@ return declare("dijit._PaletteMixin", [_CssStateMixin], {
 			for(var col=0; col < choices[row].length; col++){
 				var value = choices[row][col];
 				if(value){
-					var cellObject = this._dyeFactory(value, row, col);
+					var cellObject = this._dyeFactory(value, row, col, titles[value]);
 
 					var cellNode = domConstruct.create("td", {
 						"class": this.cellClass,
@@ -147,7 +143,7 @@ return declare("dijit._PaletteMixin", [_CssStateMixin], {
 			LEFT_ARROW: this.isLeftToRight() ? -1 : 1
 		};
 		for(var key in keyIncrementMap){
-			this._adoptHandles(
+			this.own(
 				typematic.addKeyListener(
 					this.domNode,
 					{charOrCode:keys[key], ctrlKey:false, altKey:false, shiftKey:false},
@@ -332,9 +328,9 @@ declare("dijit.Dye",
 		fillCell: function(cell, blankGif){
 			// summary:
 			//		Add cell DOMNode inner structure
-			//	cell: DomNode
+			// cell: DomNode
 			//		The surrounding cell
-			//	blankGif: String
+			// blankGif: String
 			//		URL for blank cell image
 		}
 	}

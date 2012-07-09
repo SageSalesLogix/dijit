@@ -7,7 +7,7 @@ define([
 	"dojo/dom-style", // domStyle.set
 	"dojo/_base/event", // event.stop
 	"dojo/i18n", // i18n.getLocalization
-	"dojo/keys",	//  keys.F12
+	"dojo/keys",	// keys.F12
 	"dojo/_base/lang", // lang.hitch
 	"dojo/on", // on()
 	"dojo/sniff", // has("ie") has("webkit")
@@ -23,14 +23,8 @@ define([
 ], function(array, declare, domAttr, domConstruct, domGeometry, domStyle, event, i18n, keys, lang, on, has, win,
 	winUtils, focus, _Plugin, ToggleButton, dijit, registry, aspect){
 
-/*=====
-	var _Plugin = dijit._editor._Plugin;
-=====*/
-
 // module:
 //		dijit/_editor/plugins/ViewSource
-// summary:
-//		This plugin provides a simple view source capability.
 
 
 var ViewSource = declare("dijit._editor.plugins.ViewSource",_Plugin, {
@@ -86,6 +80,7 @@ var ViewSource = declare("dijit._editor.plugins.ViewSource",_Plugin, {
 			editor = this.editor;
 		this.button = new ToggleButton({
 			label: strings["viewSource"],
+			ownerDocument: editor.ownerDocument,
 			dir: editor.dir,
 			lang: editor.lang,
 			showLabel: false,
@@ -111,7 +106,7 @@ var ViewSource = declare("dijit._editor.plugins.ViewSource",_Plugin, {
 	},
 
 
-	setEditor: function(/*dijit.Editor*/ editor){
+	setEditor: function(/*dijit/Editor*/ editor){
 		// summary:
 		//		Tell the plugin which Editor it is associated with.
 		// editor: Object
@@ -323,7 +318,7 @@ var ViewSource = declare("dijit._editor.plugins.ViewSource",_Plugin, {
 		var extents = domGeometry.getPadBorderExtents(ed.domNode);
 		var edb = {
 			w: eb.w - extents.w,
-			h: eb.h - (tbH + extents.h + + fH)
+			h: eb.h - (tbH + extents.h + fH)
 		};
 
 		// Fullscreen gets odd, so we need to check for the FS plugin and

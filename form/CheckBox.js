@@ -11,15 +11,8 @@ define([
 	"dojo/NodeList-dom" // NodeList.addClass/removeClass
 ], function(require, declare, domAttr, has, query, ready, ToggleButton, _CheckBoxMixin, template){
 
-/*=====
-	var ToggleButton = dijit.form.ToggleButton;
-	var _CheckBoxMixin = dijit.form._CheckBoxMixin;
-=====*/
-
 	// module:
 	//		dijit/form/CheckBox
-	// summary:
-	//		Checkbox widget
 
 	// Back compat w/1.6, remove for 2.0
 	if(has("dijit-legacy-requires")){
@@ -40,8 +33,9 @@ define([
 		//		we update the state of the checkbox/radio.
 		//
 		//		There are two modes:
-		//			1. High contrast mode
-		//			2. Normal mode
+		//
+		//		1. High contrast mode
+		//		2. Normal mode
 		//
 		//		In case 1, the regular html inputs are shown and used by the user.
 		//		In case 2, the regular html inputs are invisible but still used by
@@ -56,16 +50,19 @@ define([
 			//		Handler for value= attribute to constructor, and also calls to
 			//		set('value', val).
 			// description:
-			//		During initialization, just saves as attribute to the <input type=checkbox>.
+			//		During initialization, just saves as attribute to the `<input type=checkbox>`.
 			//
 			//		After initialization,
 			//		when passed a boolean, controls whether or not the CheckBox is checked.
 			//		If passed a string, changes the value attribute of the CheckBox (the one
-			//		specified as "value" when the CheckBox was constructed (ex: <input
-			//		data-dojo-type="dijit/CheckBox" value="chicken">)
-			//		widget.set('value', string) will check the checkbox and change the value to the
-			//		specified string
-			//		widget.set('value', boolean) will change the checked state.
+			//		specified as "value" when the CheckBox was constructed
+			//		(ex: `<input data-dojo-type="dijit/CheckBox" value="chicken">`).
+			//
+			//		`widget.set('value', string)` will check the checkbox and change the value to the
+			//		specified string.
+			//
+			//		`widget.set('value', boolean)` will change the checked state.
+
 			if(typeof newValue == "string"){
 				this.inherited(arguments);
 				newValue = true;

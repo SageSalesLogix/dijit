@@ -35,21 +35,9 @@ define([
 			dom, domClass, domGeometry, domStyle, event, fx, i18n, keys, lang, on, ready, has, winUtils,
 			Moveable, TimedMoveable, focus, manager, _Widget, _TemplatedMixin, _CssStateMixin, _FormMixin, _DialogMixin,
 			DialogUnderlay, ContentPane, template, dijit){
-	
-/*=====
-	var _Widget = dijit._Widget;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _CssStateMixin = dijit._CssStateMixin;
-	var _FormMixin = dijit.form._FormMixin;
-	var _DialogMixin = dijit._DialogMixin;
-=====*/	
-
 
 	// module:
 	//		dijit/Dialog
-	// summary:
-	//		A modal dialog Widget
-
 
 	/*=====
 	dijit._underlay = function(kwArgs){
@@ -64,22 +52,6 @@ define([
 	=====*/
 
 	var _DialogBase = declare("dijit._DialogBase", [_TemplatedMixin, _FormMixin, _DialogMixin, _CssStateMixin], {
-		// summary:
-		//		A modal dialog Widget
-		//
-		// description:
-		//		Pops up a modal dialog window, blocking access to the screen
-		//		and also graying out the screen Dialog is extended from
-		//		ContentPane so it supports all the same parameters (href, etc.)
-		//
-		// example:
-		// |	<div data-dojo-type="dijit/Dialog" data-dojo-props="href: 'test.html'"></div>
-		//
-		// example:
-		// |	var foo = new dijit.Dialog({ title: "test dialog", content: "test content" };
-		// |	dojo.body().appendChild(foo.domNode);
-		// |	foo.startup();
-
 		templateString: template,
 
 		baseClass: "dijitDialog",
@@ -147,10 +119,10 @@ define([
 		//		Allows the user to add an aria-describedby attribute onto the dialog.   The value should
 		//		be the id of the container element of text that describes the dialog purpose (usually
 		//		the first text in the dialog).
-		//		<div data-dojo-type="dijit/Dialog" aria-describedby="intro" .....>
-		//			<div id="intro">Introductory text</div>
-		//			<div>rest of dialog contents</div>
-		//		</div>
+		//	|	<div data-dojo-type="dijit/Dialog" aria-describedby="intro" .....>
+		//	|		<div id="intro">Introductory text</div>
+		//	|		<div>rest of dialog contents</div>
+		//	|	</div>
 		"aria-describedby":"",
 
 		// maxRatio: Number
@@ -362,7 +334,7 @@ define([
 		show: function(){
 			// summary:
 			//		Display the dialog
-			// returns: dojo.Deferred
+			// returns: dojo/_base/Deferred
 			//		Deferred object that resolves when the display animation is complete
 
 			if(this.open){ return; }
@@ -430,7 +402,7 @@ define([
 		hide: function(){
 			// summary:
 			//		Hide the dialog
-			// returns: dojo.Deferred
+			// returns: dojo/_base/Deferred
 			//		Deferred object that resolves when the hide animation is complete
 
 			// If we haven't been initialized yet then we aren't showing and we can just return.
@@ -485,8 +457,8 @@ define([
 			// tags:
 			//		private
 			if(this.domNode.style.display != "none"){
-				if(dijit._underlay){	// avoid race condition during show()
-					dijit._underlay.layout();
+				if(DialogUnderlay._singleton){	// avoid race condition during show()
+					DialogUnderlay._singleton.layout();
 				}
 				this._position();
 				this._size();
@@ -514,8 +486,21 @@ define([
 		}
 	});
 
-	var Dialog = declare("dijit.Dialog", [ContentPane, _DialogBase], {});
-	Dialog._DialogBase = _DialogBase;	// for monkey patching
+	var Dialog = declare("dijit.Dialog", [ContentPane, _DialogBase], {
+		// summary:
+		//		A modal dialog Widget.
+		// description:
+		//		Pops up a modal dialog window, blocking access to the screen
+		//		and also graying out the screen Dialog is extended from
+		//		ContentPane so it supports all the same parameters (href, etc.).
+		// example:
+		// |	<div data-dojo-type="dijit/Dialog" data-dojo-props="href: 'test.html'"></div>
+		// example:
+		// |	var foo = new Dialog({ title: "test dialog", content: "test content" };
+		// |	foo.placeAt(win.body());
+		// |	foo.startup();
+	});
+	Dialog._DialogBase = _DialogBase;	// for monkey patching and dojox/widget/DialogSimple
 
 	var DialogLevelManager = Dialog._DialogLevelManager = {
 		// summary:
@@ -525,7 +510,7 @@ define([
 
 		_beginZIndex: 950,
 
-		show: function(/*dijit._Widget*/ dialog, /*Object*/ underlayAttrs){
+		show: function(/*dijit/_WidgetBase*/ dialog, /*Object*/ underlayAttrs){
 			// summary:
 			//		Call right before fade-in animation for new dialog.
 			//		Saves current focus, displays/adjusts underlay for new dialog,
@@ -540,9 +525,10 @@ define([
 			ds[ds.length-1].focus = focus.curNode;
 
 			// Display the underlay, or if already displayed then adjust for this new dialog
-			var underlay = dijit._underlay;
+			// TODO: one underlay per document (based on dialog.ownerDocument)
+			var underlay = DialogUnderlay._singleton;
 			if(!underlay || underlay._destroyed){
-				underlay = dijit._underlay = new DialogUnderlay(underlayAttrs);
+				underlay = dijit._underlay = DialogUnderlay._singleton = new DialogUnderlay(underlayAttrs);
 			}else{
 				underlay.set(dialog.underlayAttrs);
 			}
@@ -552,7 +538,7 @@ define([
 			if(ds.length == 1){	// first dialog
 				underlay.show();
 			}
-			domStyle.set(dijit._underlay.domNode, 'zIndex', zIndex - 1);
+			domStyle.set(DialogUnderlay._singleton.domNode, 'zIndex', zIndex - 1);
 
 			// Dialog
 			domStyle.set(dialog.domNode, 'zIndex', zIndex);
@@ -560,7 +546,7 @@ define([
 			ds.push({dialog: dialog, underlayAttrs: underlayAttrs, zIndex: zIndex});
 		},
 
-		hide: function(/*dijit._Widget*/ dialog){
+		hide: function(/*dijit/_WidgetBase*/ dialog){
 			// summary:
 			//		Called when the specified dialog is hidden/destroyed, after the fade-out
 			//		animation ends, in order to reset page focus, fix the underlay, etc.
@@ -579,14 +565,14 @@ define([
 
 				// Adjust underlay, unless the underlay widget has already been destroyed
 				// because we are being called during page unload (when all widgets are destroyed)
-				if(!dijit._underlay._destroyed){
+				if(!DialogUnderlay._singleton._destroyed){
 					if(ds.length == 1){
 						// Returning to original page.  Hide the underlay.
-						dijit._underlay.hide();
+						DialogUnderlay._singleton.hide();
 					}else{
 						// Popping back to previous dialog, adjust underlay.
-						domStyle.set(dijit._underlay.domNode, 'zIndex', pd.zIndex - 1);
-						dijit._underlay.set(pd.underlayAttrs);
+						domStyle.set(DialogUnderlay._singleton.domNode, 'zIndex', pd.zIndex - 1);
+						DialogUnderlay._singleton.set(pd.underlayAttrs);
 					}
 				}
 
@@ -621,7 +607,7 @@ define([
 			}
 		},
 
-		isTop: function(/*dijit._Widget*/ dialog){
+		isTop: function(/*dijit/_WidgetBase*/ dialog){
 			// summary:
 			//		Returns true if specified Dialog is the top in the task
 			return ds[ds.length-1].dialog == dialog;

@@ -12,9 +12,6 @@ define([
 
 // module:
 //		dijit/_CssStateMixin
-// summary:
-//		Mixin for widgets to set CSS classes on the widget DOM nodes depending on hover/mouse press/focus
-//		state changes, and also higher-level state changes such becoming disabled or selected.
 
 var CssStateMixin = declare("dijit._CssStateMixin", [], {
 	// summary:
@@ -117,17 +114,19 @@ var CssStateMixin = declare("dijit._CssStateMixin", [], {
 		//
 		//		The widget may have one or more of the following states, determined
 		//		by this.state, this.checked, this.valid, and this.selected:
-		//			- Error - ValidationTextBox sets this.state to "Error" if the current input value is invalid
-		//			- Incomplete - ValidationTextBox sets this.state to "Incomplete" if the current input value is not finished yet
-		//			- Checked - ex: a checkmark or a ToggleButton in a checked state, will have this.checked==true
-		//			- Selected - ex: currently selected tab will have this.selected==true
+		//
+		//		- Error - ValidationTextBox sets this.state to "Error" if the current input value is invalid
+		//		- Incomplete - ValidationTextBox sets this.state to "Incomplete" if the current input value is not finished yet
+		//		- Checked - ex: a checkmark or a ToggleButton in a checked state, will have this.checked==true
+		//		- Selected - ex: currently selected tab will have this.selected==true
 		//
 		//		In addition, it may have one or more of the following states,
 		//		based on this.disabled and flags set in _onMouse (this.active, this.hovering) and from focus manager (this.focused):
-		//			- Disabled	- if the widget is disabled
-		//			- Active		- if the mouse (or space/enter key?) is being pressed down
-		//			- Focused		- if the widget has focus
-		//			- Hover		- if the mouse is over the widget
+		//
+		//		- Disabled	- if the widget is disabled
+		//		- Active		- if the mouse (or space/enter key?) is being pressed down
+		//		- Focused		- if the widget has focus
+		//		- Hover		- if the mouse is over the widget
 
 		// Compute new set of classes
 		var newStateClasses = this.baseClass.split(" ");
@@ -241,9 +240,10 @@ var CssStateMixin = declare("dijit._CssStateMixin", [], {
 		//		current state.   Usually not called directly, but via cssStateNodes attribute.
 		// description:
 		//		Given class=foo, will set the following CSS class on the node
-		//			- fooActive: if the user is currently pressing down the mouse button while over the node
-		//			- fooHover: if the user is hovering the mouse over the node, but not pressing down a button
-		//			- fooFocus: if the node is focused
+		//
+		//		- fooActive: if the user is currently pressing down the mouse button while over the node
+		//		- fooHover: if the user is hovering the mouse over the node, but not pressing down a button
+		//		- fooFocus: if the node is focused
 		//
 		//		Note that it won't set any classes if the widget is disabled.
 		// node: DomNode
@@ -300,10 +300,14 @@ ready(function(){
 		}
 	});
 
-	// Track focus events on widget subnodes.   Remove for 2.0 (if focus CSS needed, just use :focus pseudo-selector).
+	// Track focus events on widget sub-nodes that have been registered via _trackMouseState().
+	// However, don't track focus events on the widget root nodes, because focus is tracked via the
+	// focus manager (and it's not really tracking focus, but rather tracking that focus is on one of the widget's
+	// nodes or a subwidget's node or a popup node, etc.)
+	// Remove for 2.0 (if focus CSS needed, just use :focus pseudo-selector).
 	on(body, "focusin, focusout", function(evt){
 		var node = evt.target;
-		if(node._cssState){
+		if(node._cssState && !node.getAttribute("widgetId")){
 			var widget = registry.getEnclosingWidget(node);
 			widget._subnodeCssMouseEvent(node, node._cssState, evt);
 		}

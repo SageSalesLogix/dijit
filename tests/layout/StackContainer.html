@@ -11,9 +11,6 @@
 			background-color: white;
 			background-image: none;
 		}
-		.dijit_a11y .dijitStackController .dijitToggleButtonChecked button {
-			border-style: dashed !important;
-		}
 		div.dijitStackContainer {
 			border: solid 1px black !important;	/* override .dijitStackContainer-child rule for no border */
 			padding: 3px;
@@ -53,7 +50,10 @@
 
 			function click(/*String*/ id){
 				// Click dijit widget w/specified id
-				dijit.byId(id)._onClick({preventDefault: function(){}});
+				dijit.byId(id)._onClick({
+					preventDefault: function(){},
+					stopPropagation: function(){}
+				});
 			}
 
 			doh.register("setup", [

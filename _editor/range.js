@@ -195,9 +195,10 @@ dijit.range.adjacentNoneTextNode = function(startnode, next){
 	return [node,len];
 };
 
-dijit.range.create = function(/*Window?*/ window){	// TODO: for 2.0, replace optional window param w/mandatory window or document param
-	if(window.getSelection){
-		return ((window && window.document) || win.doc).createRange();
+dijit.range.create = function(/*Window?*/ win){	// TODO: for 2.0, replace optional window param w/mandatory window or document param
+	win = win || window;
+	if(win.getSelection){
+		return win.document.createRange();
 	}else{//IE
 		return new dijit.range.W3CRange();
 	}

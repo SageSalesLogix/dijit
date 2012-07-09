@@ -9,14 +9,11 @@ define([
 
 	// module:
 	//		dijit/form/_FormMixin
-	// summary:
-	//		Mixin for containers of form widgets (i.e. widgets that represent a single value
-	//		and can be children of a <form> node or dijit.form.Form widget)
 
 	return declare("dijit.form._FormMixin", null, {
 		// summary:
 		//		Mixin for containers of form widgets (i.e. widgets that represent a single value
-		//		and can be children of a <form> node or dijit.form.Form widget)
+		//		and can be children of a `<form>` node or `dijit/form/Form` widget)
 		// description:
 		//		Can extract all the form widgets
 		//		values and combine them into a single javascript object, or alternately
@@ -44,14 +41,13 @@ define([
 		//		which indicates that the form is ready to be submitted.
 		state: "",
 
-		//	TODO:
+		// TODO:
 		//	* Repeater
 		//	* better handling for arrays.  Often form elements have names with [] like
 		//	* people[3].sex (for a list of people [{name: Bill, sex: M}, ...])
-		//
-		//
 
-		_getDescendantFormWidgets: function(/*dijit._WidgetBase[]?*/ children){
+
+		_getDescendantFormWidgets: function(/*dijit/_WidgetBase[]?*/ children){
 			// summary:
 			//		Returns all form widget descendants, searching through non-form child widgets like BorderContainer
 			var res = [];
@@ -76,11 +72,10 @@ define([
 		validate: function(){
 			// summary:
 			//		returns if the form is valid - same as isValid - but
-			//		provides a few additional (ui-specific) features.
-			//		1 - it will highlight any sub-widgets that are not
-			//			valid
-			//		2 - it will call focus() on the first invalid
-			//			sub-widget
+			//		provides a few additional (ui-specific) features:
+			//
+			//		1. it will highlight any sub-widgets that are not valid
+			//		2. it will call focus() on the first invalid sub-widget
 			var didFocus = false;
 			return array.every(array.map(this._getDescendantFormWidgets(), function(widget){
 				// Need to set this so that "required" widgets get their
@@ -436,7 +431,7 @@ define([
 
 			// Initialize value and valid/invalid state tracking.
 			var self = this;
-			this._adoptHandles(
+			this.own(
 				on(
 					this.containerNode,
 					"attrmodified-state, attrmodified-disabled, attrmodified-value, attrmodified-checked",

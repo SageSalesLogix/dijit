@@ -11,15 +11,8 @@ define([
 	"dojo/text!./templates/Button.html"
 ], function(require, declare, domClass, has, kernel, lang, ready, _FormWidget, _ButtonMixin, template){
 
-/*=====
-	var _FormWidget = dijit.form._FormWidget;
-	var _ButtonMixin = dijit.form._ButtonMixin;
-=====*/
-
 // module:
 //		dijit/form/Button
-// summary:
-//		Button widget
 
 // Back compat w/1.6, remove for 2.0
 if(has("dijit-legacy-requires")){
@@ -73,6 +66,7 @@ return declare("dijit.form.Button", [_FormWidget, _ButtonMixin], {
 			if(this.valueNode){
 				this.valueNode.click();
 				e.preventDefault(); // cancel BUTTON click and continue with hidden INPUT click
+                e.stopPropagation();    // avoid two events bubbling from Button widget
 				// leave ok = true so that subclasses can do what they need to do
 			}
 		}

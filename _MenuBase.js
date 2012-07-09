@@ -17,16 +17,9 @@ define([
 ], function(array, declare, dom, domAttr, domClass, lang, mouse, on, winUtils,
 			pm, registry, _Widget, _KeyNavContainer, _OnDijitClickMixin, _TemplatedMixin){
 
-/*=====
-	var _Widget = dijit._Widget;
-	var _TemplatedMixin = dijit._TemplatedMixin;
-	var _KeyNavContainer = dijit._KeyNavContainer;
-=====*/
 
 // module:
 //		dijit/_MenuBase
-// summary:
-//		Base class for Menu and MenuBar
 
 return declare("dijit._MenuBase",
 	[_Widget, _TemplatedMixin, _KeyNavContainer],
@@ -48,15 +41,16 @@ return declare("dijit._MenuBase",
 	autoFocus: false,
 
 	postCreate: function(){
-		var self = this;
-		this._adoptHandles(
-			on(this.containerNode, on.selector(".dijitMenuItem", mouse.enter), function(){
+		var self = this,
+			matches = function(node){ return domClass.contains(node, "dijitMenuItem"); };
+		this.own(
+			on(this.containerNode, on.selector(matches, mouse.enter), function(){
 				self.onItemHover(registry.byNode(this));
 			}),
-			on(this.containerNode, on.selector(".dijitMenuItem", mouse.leave), function(){
+			on(this.containerNode, on.selector(matches, mouse.leave), function(){
 				self.onItemUnhover(registry.byNode(this));
 			}),
-			on(this.containerNode, on.selector(".dijitMenuItem", _OnDijitClickMixin.a11yclick), function(evt){
+			on(this.containerNode, on.selector(matches, _OnDijitClickMixin.a11yclick), function(evt){
 				self.onItemClick(registry.byNode(this), evt);
 				evt.stopPropagation();
 				evt.preventDefault();
@@ -198,7 +192,7 @@ return declare("dijit._MenuBase",
 		}
 	},
 
-	_stopPendingCloseTimer: function(/*dijit._Widget*/ popup){
+	_stopPendingCloseTimer: function(/*dijit/_WidgetBase*/ popup){
 		// summary:
 		//		Cancels the pending-close timer because the close has been preempted
 		// tags:
@@ -227,7 +221,7 @@ return declare("dijit._MenuBase",
 		return top;
 	},
 
-	onItemClick: function(/*dijit._Widget*/ item, /*Event*/ evt){
+	onItemClick: function(/*dijit/_WidgetBase*/ item, /*Event*/ evt){
 		// summary:
 		//		Handle clicks on an item.
 		// tags:
@@ -309,8 +303,10 @@ return declare("dijit._MenuBase",
 		// summary:
 		//		Mark this menu's state as active.
 		//		Called when this Menu gets focus from:
-		//			1) clicking it (mouse or via space/arrow key)
-		//			2) being opened by a parent menu.
+		//
+		//		1. clicking it (mouse or via space/arrow key)
+		//		2. being opened by a parent menu.
+		//
 		//		This is not called just from mouse hover.
 		//		Focusing a menu via TAB does NOT automatically set isActive
 		//		since TAB is a navigation operation and not a selection one.
@@ -386,9 +382,11 @@ return declare("dijit._MenuBase",
 	_onItemFocus: function(/*MenuItem*/ item){
 		// summary:
 		//		Called when child of this Menu gets focus from:
-		//			1) clicking it
-		//			2) tabbing into it
-		//			3) being opened by a parent menu.
+		//
+		//		1. clicking it
+		//		2. tabbing into it
+		//		3. being opened by a parent menu.
+		//
 		//		This is not called just from mouse hover.
 		if(this._hoveredChild && this._hoveredChild != item){
 			this.onItemUnhover(this._hoveredChild);	// any previous mouse movement is trumped by focus selection

@@ -1,7 +1,6 @@
 define([
 	"dojo/_base/array", // array.filter array.forEach
 	"dojo/_base/declare", // declare
-	"dojo/dom-attr",	// domAttr.has
 	"dojo/dom-class",	// domClass.contains domClass.toggle
 	"dojo/dom-geometry",// domGeometry.contentBox domGeometry.marginBox
 	"dojo/dom-style",
@@ -11,15 +10,11 @@ define([
 	"../registry",	// registry.byId
 	"../Viewport",
 	"./utils"	// marginBox2contextBox
-], function(array, declare, domAttr, domClass, domGeometry, domStyle, lang, query, has,
+], function(array, declare, domClass, domGeometry, domStyle, lang, query, has,
 			registry, Viewport, layoutUtils){
 
 // module:
 //		dijit/layout/_ContentPaneResizeMixin
-// summary:
-//		Resize() functionality of ContentPane.   If there's a single layout widget
-//		child then it will call resize() with the same dimensions as the ContentPane.
-//		Otherwise just calls resize on each child.
 
 
 return declare("dijit.layout._ContentPaneResizeMixin", null, {
@@ -33,8 +28,7 @@ return declare("dijit.layout._ContentPaneResizeMixin", null, {
 
 	// doLayout: Boolean
 	//		- false - don't adjust size of children
-	//		- true - if there is a single visible child widget, set it's size to
-	//				however big the ContentPane is
+	//		- true - if there is a single visible child widget, set it's size to however big the ContentPane is
 	doLayout: true,
 
 	// isLayoutContainer: [protected] Boolean
@@ -69,7 +63,7 @@ return declare("dijit.layout._ContentPaneResizeMixin", null, {
 			// monitor when viewport size changes so that I can re-layout.
 			// This is more for subclasses of ContentPane than ContentPane itself, although it
 			// could be useful for a ContentPane if it has a single child widget inheriting ContentPane's size.
-			this._adoptHandles(Viewport.on("resize", lang.hitch(this, "resize")));
+			this.own(Viewport.on("resize", lang.hitch(this, "resize")));
 		}
 	},
 

@@ -5,14 +5,8 @@ define([
 	"./HorizontalRule"
 ], function(declare, number, query, HorizontalRule){
 
-/*=====
-	var HorizontalRule = dijit.form.HorizontalRule;
-=====*/
-
 // module:
 //		dijit/form/HorizontalRuleLabels
-// summary:
-//		Labels for `dijit.form.HorizontalSlider`
 
 return declare("dijit.form.HorizontalRuleLabels", HorizontalRule, {
 	// summary:
